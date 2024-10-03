@@ -43,7 +43,7 @@ fn intervals_to_points(input: Vec<[isize; 2]>) -> Vec<(isize, isize)> {
 }
 
 /// Combine intervals with values to an efficient and reduced collection.
-/// Note: currently only integers supported as interval bounds - floats will follow.
+/// This is the isize implementation for valued intervals.
 ///
 /// # Examples
 ///
@@ -83,7 +83,7 @@ pub fn combine_intervals_values(raw_ivs: Vec<[isize; 3]>) -> HashMap<(isize, isi
 }
 
 /// Combine intervals with counts to an efficient and reduced collection.
-/// Note: currently only integers supported as interval bounds - floats will follow.
+/// This is the isize implementation for unvalued intervals.
 ///
 /// # Examples
 ///
@@ -140,7 +140,7 @@ fn intervals_to_points_flt(input: Vec<[f64; 2]>) -> Vec<(Decimal, isize)> {
 }
 
 /// Combine intervals with counts to an efficient and reduced collection.
-/// Note: currently only integers supported as interval bounds - floats will follow.
+/// This is the f64 implementation for unvalued intervals.
 ///
 /// # Examples
 ///
@@ -153,7 +153,7 @@ fn intervals_to_points_flt(input: Vec<[f64; 2]>) -> Vec<(Decimal, isize)> {
 ///
 /// // 'out' = {(0, 1): 1, (2, 3): 2, (1, 2): 3}
 /// assert_eq!(out[0], (0.0, 1.0, 1));
-/// assert_eq!(out.iter().map(|x| x.2).collect(), (1, 2, 1));
+/// assert_eq!(out.iter().map(|x| x.2).collect::<Vec<_>>(), vec!(1, 2, 1));
 /// ```
 pub fn combine_intervals_flt(raw_ivs: Vec<[f64; 2]>) -> Vec<(f64, f64, isize)> {
     // Convert input intervals to point counts
@@ -195,6 +195,22 @@ fn intervals_values_to_points_flt(input: Vec<[f64; 3]>) -> Vec<(Decimal, f64)> {
     out
 }
 
+/// Combine intervals with counts to an efficient and reduced collection.
+/// This is the f64 implementation for valued intervals.
+///
+/// # Examples
+///
+/// ```
+/// use intervalues;
+///
+/// // Two intervals, from 0 to 2 with count 1 and 1 to 3 with count 2
+/// let input: Vec<[f64; 3]> = vec!([0.0, 2.0, 1.0], [1.0, 3.0, 2.0]);
+/// let out: Vec<(f64, f64, f64)> = intervalues::combine_intervals_flt_values(input);
+///
+/// // 'out' = [(0, 1, 1), (2, 3, 2), (1, 2, 3)]
+/// assert_eq!(out[0], (0.0, 1.0, 1.0));
+/// assert_eq!(out.iter().map(|x| x.2).collect::<Vec<_>>(), vec!(1.0, 3.0, 2.0));
+/// ```
 pub fn combine_intervals_flt_values(raw_ivs: Vec<[f64; 3]>) -> Vec<(f64, f64, f64)> {
     // Convert input intervals to point counts
     let endpoints = intervals_values_to_points_flt(raw_ivs);
@@ -216,23 +232,4 @@ pub fn combine_intervals_flt_values(raw_ivs: Vec<[f64; 3]>) -> Vec<(f64, f64, f6
         }
     }
     out
-}
-
-
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    // #[test]
-    // fn different_counts() {
-    //     let input: Vec<[isize; 3]> = vec!([0, 2, 1], [1, 3, 2]);
-    //     let out: HashMap<(isize, isize), isize> = combine_intervals_values(input);
-    //
-    //     // {(0, 1): 1, (2, 3): 2, (1, 2): 3}
-    //     assert_eq!(out[&(0, 1)], 1);
-    //     assert_eq!(out[&(1, 2)], 3);
-    //     assert_eq!(out[&(2, 3)], 2);
-    // }
-
 }
