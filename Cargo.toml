@@ -1,0 +1,19 @@
+[package]
+name = "intervalues"
+version = "0.1.0"
+edition = "2021"
+description = "Combine valued intervals together efficiently"
+license = "MIT OR Apache-2.0"
+documentation = "https://docs.rs/intervalues"
+
+[dependencies]
+counter = "0.6.0"
+defaultmap = "0.6.0"
+itertools = "0.13.0"
+rand = "0.8.5"
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3
