@@ -43,3 +43,9 @@ The Python package contains organizational functionality around a core interval 
 explore speeding up this algorithm, this Rust implementation has been started. For now, the main goal is on coming to 
 a stable implementation for that core implementation, but reimplementing some of the convenience wrappers is open to
 discussion. Feel free to let me know if that would interest you!
+
+## License
+Licensed under either of Apache License, Version 2.0 or MIT license at your option.
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this crate by you, as 
+defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions. 
