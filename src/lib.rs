@@ -2,12 +2,17 @@
 //!
 //! `intervalues` brings functionality to combine valued intervals together in an efficient manner.
 
+mod base_interval;
 
 use defaultmap::DefaultHashMap;
 use itertools::Itertools;
 use std::collections::HashMap;
+use std::ops::Mul;
+use number_general::{Number, Float};
 use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
+use crate::base_interval::BaseInterval;
+use safecast::CastFrom;
 
 fn intervals_values_to_points(input: Vec<[isize; 3]>) -> Vec<(isize, isize)> {
     let mut out: DefaultHashMap<isize, isize> = DefaultHashMap::new();
@@ -224,11 +229,90 @@ pub fn combine_intervals_flt_values(raw_ivs: Vec<[f64; 3]>) -> Vec<(f64, f64, f6
     }
 
     // Convert cumulative point counts to intervals
-    // let mut out = HashMap::new();
     let mut out = Vec::new();
     for (lb, ub) in new_map.iter().tuple_windows() {
         if lb.1 != 0.0 {
             out.push((lb.0.to_f64().unwrap(), ub.0.to_f64().unwrap(), lb.1));
+        }
+    }
+    out
+}
+
+
+fn intervals_to_points_general(input: Vec<[Number; 3]>) -> Vec<(Number, Number)> {
+    let mut out: DefaultHashMap<Number, Number> = DefaultHashMap::new();
+    for entry in input.iter() {
+        let add = if entry[1] > entry[0] {
+            entry[2]
+        } else {
+            entry[2].mul(Number::from(-1))
+        };
+        out[entry[0]] += add;
+        out[entry[1]] -= add;
+    }
+    let mut out: Vec<(Number, Number)> = out
+        .iter()
+        .filter(|x| *x.1 != Number::from(0.0))
+        .map(|x| (*x.0, *x.1))
+        .collect();
+    out.sort_by_key(|x| Decimal::from_f64_retain(f64::cast_from(Float::cast_from(x.0))));
+    out
+}
+
+pub fn combine_intervals_general(raw_ivs: Vec<[Number; 3]>) -> Vec<BaseInterval> {
+    let endpoints: Vec<(Number, Number)> = intervals_to_points_general(raw_ivs);
+
+    // Convert point counts to cumulative point counts
+    let mut curr_val = Number::from(0.0);
+    let mut new_map = Vec::new();
+    for pt in endpoints {
+        curr_val += pt.1;
+        new_map.push((pt.0, curr_val))
+    }
+
+    // Convert cumulative point counts to intervals
+    let mut out = Vec::new();
+    for (lb, ub) in new_map.iter().tuple_windows() {
+        if lb.1 != Number::from(0.0) {
+            out.push(BaseInterval::new(lb.0, ub.0, lb.1));
+        }
+    }
+    out
+}
+
+
+fn base_intervals_to_points(input: Vec<BaseInterval>) -> Vec<(Number, Number)> {
+    let mut out: DefaultHashMap<Number, Number> = DefaultHashMap::new();
+    for entry in input.iter() {
+        out[entry.get_lb()] += entry.get_value();
+        out[entry.get_ub()] -= entry.get_value();
+    }
+    let mut out: Vec<(Number, Number)> = out
+        .iter()
+        .filter(|x| *x.1 != Number::from(0.0))
+        .map(|x| (*x.0, *x.1))
+        .collect();
+    out.sort_by_key(|x| Decimal::from_f64_retain(f64::cast_from(Float::cast_from(x.0))));
+    out
+}
+
+
+pub fn combine_base_intervals(raw_ivs: Vec<BaseInterval>) -> Vec<BaseInterval> {
+    let endpoints: Vec<(Number, Number)> = base_intervals_to_points(raw_ivs);
+
+    // Convert point counts to cumulative point counts
+    let mut curr_val = Number::from(0.0);
+    let mut new_map = Vec::new();
+    for pt in endpoints {
+        curr_val += pt.1;
+        new_map.push((pt.0, curr_val))
+    }
+
+    // Convert cumulative point counts to intervals
+    let mut out = Vec::new();
+    for (lb, ub) in new_map.iter().tuple_windows() {
+        if lb.1 != Number::from(0.0) {
+            out.push(BaseInterval::new(lb.0, ub.0, lb.1));
         }
     }
     out

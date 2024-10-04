@@ -16,6 +16,8 @@ itertools = "0.13.0"
 rand = "0.8.5"
 rust_decimal = "1.36.0"
 rust_decimal_macros = "1.36.0"
+number-general = "0.12.0"
+safecast = "0.2.2"
 
 [profile.dev]
 opt-level = 3
