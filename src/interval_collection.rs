@@ -16,15 +16,18 @@ impl IntervalCollection {
     }
 
     pub fn get_bounds(&self) -> (Number, Number) {
-        (self[0].lb, self[-1].ub)
+        // Todo: properly deal with empty collection
+        (self.intervals[0].get_lb(), self.intervals.last().unwrap().get_ub())
     }
 
     pub fn get_lb(&self) -> Number {
-        self[0].lb
+        // Todo: properly deal with empty collection
+        self.intervals[0].get_lb()
     }
 
     pub fn get_ub(&self) -> Number {
-        self[-1].ub
+        // Todo: properly deal with empty collection
+        self.intervals.last().unwrap().get_ub()
     }
 
     pub fn len(&self) -> usize {
@@ -32,11 +35,11 @@ impl IntervalCollection {
     }
 
     pub fn total_value(&self) -> Number {
-        self.intervals.iter().map(|x| x.get_total_value()).sum()
+        self.intervals.iter().map(|x| x.get_total_value()).sum::<Number>()
     }
 
     pub fn contains_num(&self, num: Number) -> bool {
-        for interval in self.intervals {
+        for interval in self.intervals.iter() {
             if interval.contains(num) {
                 return true;
             }
@@ -45,7 +48,7 @@ impl IntervalCollection {
     }
 
     pub fn get_value(&self, num: Number) -> Number {
-        for interval in self.intervals {
+        for interval in self.intervals.iter() {
             if interval.contains(num) {
                 return interval.get_value();
             }
@@ -55,7 +58,7 @@ impl IntervalCollection {
 
     pub fn contains_interval(&self, interval: BaseInterval) -> bool {
         let mut to_check = interval.clone();
-        for interval in self.intervals {
+        for interval in self.intervals.iter() {
             if interval.superset(to_check) {
                 return true;
             } else if &to_check.get_lb() < &interval.get_lb() {
@@ -73,7 +76,7 @@ impl IntervalCollection {
     pub fn get_value_of_interval_by_parts(&self, interval: BaseInterval) -> IntervalCollection {
         let mut values = Vec::new();
         let mut to_check = interval.clone();
-        for interval in self.intervals {
+        for interval in self.intervals.iter() {
             if interval.superset(to_check) {
                 let new = BaseInterval::new(
                     to_check.get_lb(),
@@ -94,9 +97,9 @@ impl IntervalCollection {
         IntervalCollection::from_vec(values)
     }
 
-    pub fn get_partially_overlaps_interval(&self, other: BaseInterval) -> bool {
-        for interval in self.intervals {
-            if interval.overlaps(other) {
+    pub fn get_partially_overlaps_interval(&self, other: &BaseInterval) -> bool {
+        for interval in self.intervals.iter() {
+            if interval.overlaps(*other) {
                 return true;
             }
         }
@@ -104,7 +107,7 @@ impl IntervalCollection {
     }
 
     pub fn get_partially_overlaps(&self, other: IntervalCollection) -> bool {
-        for interval in other.intervals {
+        for interval in other.intervals.iter() {
             if self.get_partially_overlaps_interval(interval) {
                 return true;
             }

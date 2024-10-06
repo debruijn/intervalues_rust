@@ -1,4 +1,4 @@
-use number_general::{Int, Number, NumberInstance};
+use number_general::{Int, Number};
 use safecast::CastFrom;
 
 #[derive(Clone, Copy, Hash, Eq, PartialEq, Debug)]

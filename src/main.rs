@@ -89,7 +89,7 @@ fn main() {
     let after = Instant::now();
     println!(
         "{:?} in {:?}",
-        hi.iter().map(|x| x.to_array()).collect_vec(),
+        hi.to_vec().iter().map(|x| x.to_array()).collect_vec(),
         after - before
     );
 }
