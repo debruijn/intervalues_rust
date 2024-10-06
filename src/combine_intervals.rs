@@ -14,12 +14,12 @@ fn intervals_values_to_points(input: Vec<[isize; 3]>) -> Vec<(isize, isize)> {
         out[entry[0]] += mult * entry[2];
         out[entry[1]] -= mult * entry[2];
     }
-    let mut out: Vec<(isize, isize)> = out
+    let out: Vec<(isize, isize)> = out
         .iter()
         .filter(|x| *x.1 != 0)
+        .sorted()
         .map(|x| (*x.0, *x.1))
         .collect();
-    out.sort();
     out
 }
 
@@ -30,12 +30,12 @@ fn intervals_to_points(input: Vec<[isize; 2]>) -> Vec<(isize, isize)> {
         out[entry[0]] += mult;
         out[entry[1]] -= mult;
     }
-    let mut out: Vec<(isize, isize)> = out
+    let out: Vec<(isize, isize)> = out
         .iter()
         .filter(|x| *x.1 != 0)
+        .sorted()
         .map(|x| (*x.0, *x.1))
         .collect();
-    out.sort();
     out
 }
 

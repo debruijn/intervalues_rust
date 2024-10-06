@@ -74,7 +74,7 @@ fn main() {
 
     println!(
         "\n(6) Valued and using Number typed interval borders, value set to 1.0 for all. \
-    Converts to BaseInterval and returns BaseInterval"
+    Converts to BaseInterval and returns IntervalCollection"
     );
     let mut input: Vec<BaseInterval> = Vec::new();
     for _ in 0..1000000 {
