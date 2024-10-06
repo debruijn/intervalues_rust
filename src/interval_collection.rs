@@ -119,9 +119,14 @@ impl IntervalCollection {
         IntervalCollection { intervals: vec }
     }
 
-    pub fn to_vec(self) -> Vec<BaseInterval> {
+    pub fn to_vec_owned(self) -> Vec<BaseInterval> {
         self.intervals
     }
+
+    pub fn to_vec(self) -> Vec<BaseInterval> {
+        self.intervals.clone()
+    }
+
 
     pub fn to_vec_as_counter(&self) -> Vec<BaseInterval> {
         let mut new = Vec::new();
