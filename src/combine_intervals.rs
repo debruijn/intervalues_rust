@@ -1,10 +1,11 @@
-use std::collections::HashMap;
+use crate::base_interval::BaseInterval;
 use defaultmap::DefaultHashMap;
 use itertools::Itertools;
 use number_general::{Float, Number};
 use rust_decimal::Decimal;
 use safecast::CastFrom;
-use crate::base_interval::BaseInterval;
+use std::collections::HashMap;
+use crate::IntervalCollection;
 
 fn intervals_values_to_points(input: Vec<[isize; 3]>) -> Vec<(isize, isize)> {
     let mut out: DefaultHashMap<isize, isize> = DefaultHashMap::new();
@@ -21,7 +22,6 @@ fn intervals_values_to_points(input: Vec<[isize; 3]>) -> Vec<(isize, isize)> {
     out.sort();
     out
 }
-
 
 fn intervals_to_points(input: Vec<[isize; 2]>) -> Vec<(isize, isize)> {
     let mut out: DefaultHashMap<isize, isize> = DefaultHashMap::new();
@@ -119,7 +119,6 @@ pub fn combine_intervals_isize_no_val(raw_ivs: Vec<[isize; 2]>) -> HashMap<(isiz
     out
 }
 
-
 fn base_intervals_to_points(input: Vec<BaseInterval>) -> Vec<(Number, Number)> {
     let mut out: DefaultHashMap<Number, Number> = DefaultHashMap::new();
     for entry in input.iter() {
@@ -135,7 +134,6 @@ fn base_intervals_to_points(input: Vec<BaseInterval>) -> Vec<(Number, Number)> {
     out
 }
 
-
 /// Combine intervals with values to an efficient and reduced collection.
 /// This is the BaseInterval implementation for valued intervals - which is the main implementation.
 ///
@@ -145,20 +143,20 @@ fn base_intervals_to_points(input: Vec<BaseInterval>) -> Vec<(Number, Number)> {
 /// use std::collections::HashMap;
 /// use number_general::Number;
 /// use intervalues;
-/// use intervalues::BaseInterval;
+/// use intervalues::{BaseInterval, IntervalCollection};
 ///
 /// // Two intervals, from 0 to 2 with count 1 and 1 to 3 with count 2
 /// let input: Vec<[i64; 3]> = vec!([0, 2, 1], [1, 3, 2]);
 /// let input = input.iter()
 ///     .map(|x| BaseInterval::new(Number::from(x[0]), Number::from(x[1]), Number::from(x[2])))
 ///     .collect();
-/// let out: Vec<BaseInterval> = intervalues::combine_intervals(input);
+/// let out: IntervalCollection = intervalues::combine_intervals(input);
 ///
 /// // 'out' = {(0, 1, 1), (2, 3, 2), (1, 2, 3)}
-/// assert_eq!(out[0], BaseInterval::default());
-/// assert_eq!(out[1], BaseInterval::new(Number::from(1), Number::from(2), Number::from(3)));
+/// assert_eq!(out.to_vec_as_counter()[0], BaseInterval::default());
+/// assert_eq!(out.to_vec_owned()[1], BaseInterval::new(Number::from(1), Number::from(2), Number::from(3)));
 /// ```
-pub fn combine_intervals(raw_ivs: Vec<BaseInterval>) -> Vec<BaseInterval> {
+pub fn combine_intervals(raw_ivs: Vec<BaseInterval>) -> IntervalCollection {
     let endpoints: Vec<(Number, Number)> = base_intervals_to_points(raw_ivs);
 
     // Convert point counts to cumulative point counts
@@ -176,5 +174,5 @@ pub fn combine_intervals(raw_ivs: Vec<BaseInterval>) -> Vec<BaseInterval> {
             out.push(BaseInterval::new(lb.0, ub.0, lb.1));
         }
     }
-    out
+    IntervalCollection::from_vec(out)
 }
