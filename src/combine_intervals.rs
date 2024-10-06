@@ -1,10 +1,10 @@
-use std::collections::HashMap;
+use crate::base_interval::BaseInterval;
 use defaultmap::DefaultHashMap;
 use itertools::Itertools;
 use number_general::{Float, Number};
 use rust_decimal::Decimal;
 use safecast::CastFrom;
-use crate::base_interval::BaseInterval;
+use std::collections::HashMap;
 
 fn intervals_values_to_points(input: Vec<[isize; 3]>) -> Vec<(isize, isize)> {
     let mut out: DefaultHashMap<isize, isize> = DefaultHashMap::new();
@@ -21,7 +21,6 @@ fn intervals_values_to_points(input: Vec<[isize; 3]>) -> Vec<(isize, isize)> {
     out.sort();
     out
 }
-
 
 fn intervals_to_points(input: Vec<[isize; 2]>) -> Vec<(isize, isize)> {
     let mut out: DefaultHashMap<isize, isize> = DefaultHashMap::new();
@@ -119,7 +118,6 @@ pub fn combine_intervals_isize_no_val(raw_ivs: Vec<[isize; 2]>) -> HashMap<(isiz
     out
 }
 
-
 fn base_intervals_to_points(input: Vec<BaseInterval>) -> Vec<(Number, Number)> {
     let mut out: DefaultHashMap<Number, Number> = DefaultHashMap::new();
     for entry in input.iter() {
@@ -134,7 +132,6 @@ fn base_intervals_to_points(input: Vec<BaseInterval>) -> Vec<(Number, Number)> {
     out.sort_by_key(|x| Decimal::from_f64_retain(f64::cast_from(Float::cast_from(x.0))));
     out
 }
-
 
 /// Combine intervals with values to an efficient and reduced collection.
 /// This is the BaseInterval implementation for valued intervals - which is the main implementation.

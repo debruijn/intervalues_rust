@@ -5,22 +5,26 @@ use safecast::CastFrom;
 pub struct BaseInterval {
     lb: Number,
     ub: Number,
-    val: Number
+    val: Number,
 }
 
 impl Default for BaseInterval {
     fn default() -> Self {
-        BaseInterval{lb: Number::from(0), ub: Number::from(1), val: Number::from(1)}
+        BaseInterval {
+            lb: Number::from(0),
+            ub: Number::from(1),
+            val: Number::from(1),
+        }
     }
 }
 
 impl BaseInterval {
     pub fn new(lb: Number, ub: Number, val: Number) -> Self {
-        BaseInterval{lb, ub, val}
+        BaseInterval { lb, ub, val }
     }
 
     pub fn to_vec(self) -> Vec<Number> {
-        vec!(self.lb, self.ub, self.val)
+        vec![self.lb, self.ub, self.val]
     }
 
     pub fn to_array(self) -> [Number; 3] {
@@ -69,9 +73,17 @@ impl BaseInterval {
             vec[2]
         };
         if vec[0] < vec[1] {
-            BaseInterval { lb: vec[0], ub: vec[1], val }
+            BaseInterval {
+                lb: vec[0],
+                ub: vec[1],
+                val,
+            }
         } else {
-            BaseInterval { lb: vec[1], ub: vec[0], val }
+            BaseInterval {
+                lb: vec[1],
+                ub: vec[0],
+                val,
+            }
         }
     }
 
@@ -117,7 +129,7 @@ impl BaseInterval {
         // Two options to enter this -> same range, or bordering range but same val
         // So test (and if so, return for) option 1, and then continue with option 2
         if (self.ub == other.ub) && (self.lb == other.lb) {
-            return BaseInterval::new(self.lb, self.ub, self.val + other.val)
+            return BaseInterval::new(self.lb, self.ub, self.val + other.val);
         }
 
         // Option 2 from above
@@ -129,7 +141,8 @@ impl BaseInterval {
         BaseInterval::new(lb, ub, self.val)
     }
 
-    pub fn val_to_count(self) -> BaseInterval { // To test if this works
+    pub fn val_to_count(self) -> BaseInterval {
+        // To test if this works
         if self.val >= Number::from(1) {
             BaseInterval::new(self.lb, self.ub, Number::from(Int::cast_from(self.val)))
         } else {
@@ -158,6 +171,4 @@ impl BaseInterval {
         };
         BaseInterval::new(lb, ub, Number::from(1))
     }
-
-
 }

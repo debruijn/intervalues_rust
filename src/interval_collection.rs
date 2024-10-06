@@ -1,5 +1,5 @@
-use number_general::Number;
 use crate::BaseInterval;
+use number_general::Number;
 
 #[derive(Clone, Hash, Eq, PartialEq, Debug)]
 pub struct IntervalCollection {
@@ -10,7 +10,9 @@ impl IntervalCollection {
     // Assumes ICs are always sorted by combine_intervals
 
     pub fn new() -> Self {
-        IntervalCollection {intervals: Vec::new()}
+        IntervalCollection {
+            intervals: Vec::new(),
+        }
     }
 
     pub fn get_bounds(&self) -> (Number, Number) {
@@ -36,7 +38,7 @@ impl IntervalCollection {
     pub fn contains_num(&self, num: Number) -> bool {
         for interval in self.intervals {
             if interval.contains(num) {
-                return true
+                return true;
             }
         }
         false
@@ -45,7 +47,7 @@ impl IntervalCollection {
     pub fn get_value(&self, num: Number) -> Number {
         for interval in self.intervals {
             if interval.contains(num) {
-                return interval.get_value()
+                return interval.get_value();
             }
         }
         Number::from(0)
@@ -55,13 +57,14 @@ impl IntervalCollection {
         let mut to_check = interval.clone();
         for interval in self.intervals {
             if interval.superset(to_check) {
-                return true
+                return true;
             } else if &to_check.get_lb() < &interval.get_lb() {
-                return false
+                return false;
             } else if &to_check.get_lb() > &interval.get_ub() {
-                continue
+                continue;
             } else {
-                to_check = BaseInterval::new(interval.get_ub(), to_check.get_ub(), to_check.get_value());
+                to_check =
+                    BaseInterval::new(interval.get_ub(), to_check.get_ub(), to_check.get_value());
             }
         }
         false
@@ -72,15 +75,20 @@ impl IntervalCollection {
         let mut to_check = interval.clone();
         for interval in self.intervals {
             if interval.superset(to_check) {
-                let new = BaseInterval::new(to_check.get_lb(), to_check.get_ub(), interval.get_value() / to_check.get_value());
+                let new = BaseInterval::new(
+                    to_check.get_lb(),
+                    to_check.get_ub(),
+                    interval.get_value() / to_check.get_value(),
+                );
                 values.push(new);
-                return IntervalCollection::from_vec(values)
+                return IntervalCollection::from_vec(values);
             } else if &to_check.get_lb() < &interval.get_lb() {
-                return IntervalCollection::from_vec(values)
+                return IntervalCollection::from_vec(values);
             } else if &to_check.get_lb() > &interval.get_ub() {
-                continue
+                continue;
             } else {
-                to_check = BaseInterval::new(interval.get_ub(), to_check.get_ub(), to_check.get_value());
+                to_check =
+                    BaseInterval::new(interval.get_ub(), to_check.get_ub(), to_check.get_value());
             }
         }
         IntervalCollection::from_vec(values)
@@ -98,7 +106,7 @@ impl IntervalCollection {
     pub fn get_partially_overlaps(&self, other: IntervalCollection) -> bool {
         for interval in other.intervals {
             if self.get_partially_overlaps_interval(interval) {
-                return true
+                return true;
             }
         }
         false
@@ -115,7 +123,7 @@ impl IntervalCollection {
     pub fn to_vec_as_counter(&self) -> Vec<BaseInterval> {
         let mut new = Vec::new();
         if self.len() == 0 {
-            return new
+            return new;
         }
         let mut this_interval = self.intervals[0].val_to_count();
         for next_interval in self.intervals[1..].iter() {
@@ -138,7 +146,7 @@ impl IntervalCollection {
     pub fn to_vec_as_set(&self) -> Vec<BaseInterval> {
         let mut new = Vec::new();
         if self.len() == 0 {
-            return new
+            return new;
         }
         let mut this_interval = self.intervals[0];
         for next_interval in self.intervals[1..].iter() {
@@ -152,5 +160,4 @@ impl IntervalCollection {
         new.push(this_interval);
         new
     }
-
 }

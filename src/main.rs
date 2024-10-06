@@ -1,17 +1,21 @@
-use std::time::Instant;
+use intervalues;
+use intervalues::BaseInterval;
 use itertools::Itertools;
 use number_general::Number;
-use intervalues;
 use rand::Rng;
-use intervalues::BaseInterval;
+use std::time::Instant;
 
 fn main() {
     let mut rng = rand::thread_rng();
 
-    println!("Running the binary of >intervalues< will show a demo of what the library of it can do.");
+    println!(
+        "Running the binary of >intervalues< will show a demo of what the library of it can do."
+    );
     println!("What follows are variations of combining 1 000 000 intervals between 0 and 9:");
 
-    println!("\n(1) Unvalued and using <isize> typed interval borders. Returns HashMap<(lb,ub),val>.");
+    println!(
+        "\n(1) Unvalued and using <isize> typed interval borders. Returns HashMap<(lb,ub),val>."
+    );
     let mut input: Vec<[isize; 2]> = Vec::new();
     for _ in 0..1000000 {
         input.push([rng.gen_range(0..10), rng.gen_range(0..10)])
@@ -21,8 +25,10 @@ fn main() {
     let after = Instant::now();
     println!("{:?} in {:?}", hi, after - before);
 
-    println!("\n(2) Valued and using <isize> typed interval borders, value set to 1 for all. \
-    Returns HashMap<(lb,ub),val>.");
+    println!(
+        "\n(2) Valued and using <isize> typed interval borders, value set to 1 for all. \
+    Returns HashMap<(lb,ub),val>."
+    );
     let mut input: Vec<[isize; 3]> = Vec::new();
     for _ in 0..1000000 {
         input.push([rng.gen_range(0..10), rng.gen_range(0..10), 1])
@@ -66,17 +72,24 @@ fn main() {
     // let after = Instant::now();
     // println!("{:?} in {:?}", hi, after - before);
 
-    println!("\n(6) Valued and using Number typed interval borders, value set to 1.0 for all. \
-    Converts to BaseInterval and returns BaseInterval");
+    println!(
+        "\n(6) Valued and using Number typed interval borders, value set to 1.0 for all. \
+    Converts to BaseInterval and returns BaseInterval"
+    );
     let mut input: Vec<BaseInterval> = Vec::new();
     for _ in 0..1000000 {
-        input.push(BaseInterval::new(Number::from(rng.gen_range(0..10)),
+        input.push(BaseInterval::new(
             Number::from(rng.gen_range(0..10)),
-            Number::from(1)));
+            Number::from(rng.gen_range(0..10)),
+            Number::from(1),
+        ));
     }
     let before = Instant::now();
     let hi = intervalues::combine_intervals(input);
     let after = Instant::now();
-    println!("{:?} in {:?}", hi.iter().map(|x| x.to_array()).collect_vec(), after - before);
-
+    println!(
+        "{:?} in {:?}",
+        hi.iter().map(|x| x.to_array()).collect_vec(),
+        after - before
+    );
 }
