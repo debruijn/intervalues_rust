@@ -1,5 +1,5 @@
-use number_general::Number;
-
+use number_general::{Int, Number, NumberInstance};
+use safecast::CastFrom;
 
 #[derive(Clone, Copy, Hash, Eq, PartialEq, Debug)]
 pub struct BaseInterval {
@@ -101,6 +101,40 @@ impl BaseInterval {
 
     pub fn overlaps(self, other: BaseInterval) -> bool {
         self.left_overlaps(other) || self.right_overlaps(other)
+    }
+
+    pub fn can_join(self, other: &BaseInterval) -> bool {
+        if ((self.ub == other.lb) || (other.ub == self.lb)) && (self.val == other.val) {
+            true
+        } else if (self.ub == other.ub) && (self.lb == other.lb) {
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn join(self, other: &BaseInterval) -> BaseInterval {
+        // Two options to enter this -> same range, or bordering range but same val
+        // So test (and if so, return for) option 1, and then continue with option 2
+        if (self.ub == other.ub) && (self.lb == other.lb) {
+            return BaseInterval::new(self.lb, self.ub, self.val + other.val)
+        }
+
+        // Option 2 from above
+        let (lb, ub) = if self.lb < other.lb {
+            (self.lb, other.ub)
+        } else {
+            (other.lb, self.ub)
+        };
+        BaseInterval::new(lb, ub, self.val)
+    }
+
+    pub fn val_to_count(self) -> BaseInterval { // To test if this works
+        if self.val >= Number::from(1) {
+            BaseInterval::new(self.lb, self.ub, Number::from(Int::cast_from(self.val)))
+        } else {
+            BaseInterval::new(self.lb, self.ub, Number::from(0))
+        }
     }
 
     pub fn can_join_ign_value(self, other: &BaseInterval) -> bool {

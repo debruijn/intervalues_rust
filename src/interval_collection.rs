@@ -112,6 +112,29 @@ impl IntervalCollection {
         self.intervals
     }
 
+    pub fn to_vec_as_counter(&self) -> Vec<BaseInterval> {
+        let mut new = Vec::new();
+        if self.len() == 0 {
+            return new
+        }
+        let mut this_interval = self.intervals[0].val_to_count();
+        for next_interval in self.intervals[1..].iter() {
+            let next_count = next_interval.val_to_count();
+            if this_interval.can_join(&next_count) {
+                this_interval = this_interval.join(&next_count);
+            } else {
+                if this_interval.get_value() > Number::from(0) {
+                    new.push(this_interval);
+                }
+                this_interval = next_count;
+            }
+        }
+        if this_interval.get_value() > Number::from(0) {
+            new.push(this_interval);
+        }
+        new
+    }
+
     pub fn to_vec_as_set(&self) -> Vec<BaseInterval> {
         let mut new = Vec::new();
         if self.len() == 0 {
