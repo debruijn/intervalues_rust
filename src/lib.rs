@@ -4,6 +4,7 @@
 
 mod base_interval;
 mod combine_intervals;
+mod interval_collection;
 // mod archive;
 
 pub use crate::combine_intervals::{combine_intervals,
