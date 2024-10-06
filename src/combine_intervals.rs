@@ -153,8 +153,8 @@ fn base_intervals_to_points(input: Vec<BaseInterval>) -> Vec<(Number, Number)> {
 /// let out: IntervalCollection = intervalues::combine_intervals(input);
 ///
 /// // 'out' = {(0, 1, 1), (2, 3, 2), (1, 2, 3)}
-/// assert_eq!(out[0], BaseInterval::default());
-/// assert_eq!(out[1], BaseInterval::new(Number::from(1), Number::from(2), Number::from(3)));
+/// assert_eq!(out.to_vec_as_counter()[0], BaseInterval::default());
+/// assert_eq!(out.to_vec()[1], BaseInterval::new(Number::from(1), Number::from(2), Number::from(3)));
 /// ```
 pub fn combine_intervals(raw_ivs: Vec<BaseInterval>) -> IntervalCollection {
     let endpoints: Vec<(Number, Number)> = base_intervals_to_points(raw_ivs);
