@@ -1,6 +1,6 @@
 [package]
 name = "intervalues"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 description = "Combine valued intervals together efficiently"
 license = "MIT OR Apache-2.0"
@@ -15,9 +15,8 @@ defaultmap = "0.6.0"
 itertools = "0.13.0"
 rand = "0.8.5"
 rust_decimal = "1.36.0"
-rust_decimal_macros = "1.36.0"
-number-general = "0.12.0"
-safecast = "0.2.2"
+safecast = "0.2.3"
+num-traits = "0.2.19"
 
 [profile.dev]
 opt-level = 3
