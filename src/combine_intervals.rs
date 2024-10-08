@@ -6,7 +6,6 @@ use num_traits::{Num, ToPrimitive};
 use std::hash::Hash;
 use std::ops::{AddAssign, SubAssign};
 
-// TODO: generalize beyond isize
 fn base_intervals_to_points<T, U>(input: Vec<BaseInterval<T, U>>) -> Vec<(T, U)>
 where
     T: Num + PartialOrd + Clone + Eq + Hash + Copy,
@@ -24,7 +23,6 @@ where
         .map(|x| (x.0.to_owned(), x.1.to_owned()))
         .collect();
     out.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    // out.sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());
     out
 }
 
@@ -63,7 +61,7 @@ where
         + ToPrimitive
         + std::iter::Sum,
 {
-    let endpoints: Vec<(T, U)> = base_intervals_to_points(raw_ivs); // TODO: generalize beyond isize
+    let endpoints: Vec<(T, U)> = base_intervals_to_points(raw_ivs);
 
     // Convert point counts to cumulative point counts
     let mut curr_val = U::zero();
