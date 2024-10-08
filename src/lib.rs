@@ -5,11 +5,7 @@
 mod base_interval;
 mod combine_intervals;
 mod interval_collection;
-// mod archive;
 
-pub use crate::combine_intervals::{
-    combine_intervals, combine_intervals_isize, combine_intervals_isize_no_val,
-};
-// pub use crate::archive::combine_intervals_general;
+pub use crate::combine_intervals::combine_intervals;
 pub use crate::base_interval::BaseInterval;
 pub use crate::interval_collection::IntervalCollection;
