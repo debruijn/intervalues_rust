@@ -1,8 +1,10 @@
+use crate::BaseInterval;
 use num_traits::{Num, ToPrimitive};
 use std::cmp::PartialOrd;
-use crate::BaseInterval;
+use std::fmt;
+use std::fmt::{Debug, Display, Formatter};
 
-#[derive(Clone, Copy, Hash, Eq, PartialEq, Debug)]
+#[derive(Clone, Copy, Hash, Eq, PartialEq)]
 pub struct Interval<T: Num, U: Num> {
     lb: T,
     ub: T,
@@ -23,11 +25,30 @@ where
     }
 }
 
+impl<T, U> Debug for Interval<T, U>
+where
+    T: Num + PartialOrd + Clone + Display,
+    U: Num + PartialOrd + Display,
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.print())
+    }
+}
+
+impl<T, U> Display for Interval<T, U>
+where
+    T: Num + PartialOrd + Clone + Display,
+    U: Num + PartialOrd + Display,
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.print())
+    }
+}
 
 impl<T, U> Interval<T, U>
 where
-    T: Num + PartialOrd + Clone,
-    U: Num + PartialOrd,
+    T: Num + PartialOrd + Clone + Display,
+    U: Num + PartialOrd + Display,
 {
     pub fn new(lb: T, ub: T, val: U) -> Self {
         if ub > lb {
@@ -39,6 +60,10 @@ where
                 val,
             }
         }
+    }
+
+    pub fn print(&self) -> String {
+        format!("[{};{}]x{}", self.lb, self.ub, self.val)
     }
 
     pub fn to_tuple(self) -> (T, T, U) {
@@ -154,7 +179,6 @@ where
         Interval::new(lb, ub, U::one())
     }
 
-
     pub fn join_as_set(self, other: Interval<T, U>) -> BaseInterval<T> {
         let lb = if self.lb < other.lb {
             self.lb
@@ -185,7 +209,7 @@ where
 
 impl<T, U> Interval<T, U>
 where
-    T: Num + Clone + PartialOrd,
+    T: Num + Clone + PartialOrd + Display,
     U: Num + PartialOrd + ToPrimitive,
 {
     pub fn val_to_count(self) -> Interval<T, usize> {

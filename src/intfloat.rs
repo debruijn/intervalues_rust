@@ -1,10 +1,10 @@
 use num_traits::{Num, One, Pow, ToPrimitive, Zero};
 use std::fmt;
-use std::fmt::{Debug, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 use std::num::ParseIntError;
 use std::ops::{Add, AddAssign, Div, Mul, Rem, Sub, SubAssign};
 
-#[derive(Clone, Copy, Hash, Eq, PartialEq, PartialOrd, Default)]
+#[derive(Clone, Copy, Hash, Eq, PartialEq, PartialOrd, Default, Debug)]
 pub struct IntFloat {
     base: isize,
     pow: isize,
@@ -39,7 +39,7 @@ impl IntFloat {
     }
 }
 
-impl Debug for IntFloat {
+impl Display for IntFloat {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.print())
     }

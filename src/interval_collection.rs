@@ -1,16 +1,29 @@
 use crate::{BaseInterval, Interval};
 use num_traits::{Num, ToPrimitive};
 use safecast::CastInto;
+use std::fmt;
+use std::fmt::{Debug, Display, Formatter};
 
 #[derive(Clone, Hash, Eq, PartialEq, Debug)]
-pub struct IntervalCollection<T: Num, U: Num> {
+pub struct IntervalCollection<T: Num + PartialOrd + Clone + Display, U: Num + PartialOrd + Display>
+{
     intervals: Vec<Interval<T, U>>,
+}
+
+impl<T, U> Display for IntervalCollection<T, U>
+where
+    T: Num + PartialOrd + Clone + Copy + Display,
+    U: Num + PartialOrd + Clone + Copy + Display + std::iter::Sum,
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.print())
+    }
 }
 
 impl<T, U> IntervalCollection<T, U>
 where
-    T: Num + PartialOrd + Clone + Copy,
-    U: Num + PartialOrd + Clone + Copy + std::iter::Sum,
+    T: Num + PartialOrd + Clone + Copy + Display,
+    U: Num + PartialOrd + Clone + Copy + Display + std::iter::Sum,
 {
     // Assumes ICs are always sorted by combine_intervals
 
@@ -20,11 +33,12 @@ where
         }
     }
 
-    pub fn get_bounds(&self) -> (T, T) {
-        // Todo: properly deal with empty collection
-        (
-            self.intervals[0].get_lb(),
-            self.intervals.last().unwrap().get_ub(),
+    pub fn print(&self) -> String {
+        format!(
+            "IntervalCollection ({}x between {} and {})",
+            self.len(),
+            self.get_lb(),
+            self.get_ub()
         )
     }
 
@@ -40,6 +54,14 @@ where
 
     pub fn len(&self) -> usize {
         self.intervals.len()
+    }
+
+    pub fn get_bounds(&self) -> (T, T) {
+        // Todo: properly deal with empty collection
+        (
+            self.intervals[0].get_lb(),
+            self.intervals.last().unwrap().get_ub(),
+        )
     }
 
     pub fn contains_num(&self, num: T) -> bool {
@@ -156,8 +178,8 @@ where
 
 impl<T, U> IntervalCollection<T, U>
 where
-    T: Num + PartialOrd + Clone + Copy,
-    U: Num + PartialOrd + Clone + Copy + std::iter::Sum + From<T>,
+    T: Num + PartialOrd + Clone + Copy + Display,
+    U: Num + PartialOrd + Clone + Copy + std::iter::Sum + From<T> + Display,
 {
     pub fn total_value(&self) -> U {
         self.intervals
@@ -169,8 +191,8 @@ where
 
 impl<T, U> IntervalCollection<T, U>
 where
-    T: Num + PartialOrd + Clone + Copy,
-    U: Num + PartialOrd + Clone + Copy + ToPrimitive + std::iter::Sum,
+    T: Num + PartialOrd + Clone + Copy + Display,
+    U: Num + PartialOrd + Clone + Copy + ToPrimitive + std::iter::Sum + Display,
 {
     pub fn to_vec_as_counter(&self) -> Vec<Interval<T, usize>> {
         let mut new = Vec::new();

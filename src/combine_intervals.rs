@@ -3,13 +3,14 @@ use crate::IntervalCollection;
 use defaultmap::DefaultHashMap;
 use itertools::Itertools;
 use num_traits::{Num, ToPrimitive};
+use std::fmt::Display;
 use std::hash::Hash;
 use std::ops::{AddAssign, SubAssign};
 
 fn base_intervals_to_points<T, U>(input: Vec<Interval<T, U>>) -> Vec<(T, U)>
 where
-    T: Num + PartialOrd + Clone + Eq + Hash + Copy,
-    U: Num + PartialOrd + Default + AddAssign + SubAssign + Clone + Copy,
+    T: Num + PartialOrd + Clone + Eq + Hash + Copy + Display,
+    U: Num + PartialOrd + Default + AddAssign + SubAssign + Clone + Copy + Display,
 {
     let mut out: DefaultHashMap<T, U> = DefaultHashMap::new();
     for entry in input.iter() {
@@ -50,7 +51,7 @@ where
 pub fn combine_intervals<T, U>(raw_ivs: Vec<Interval<T, U>>) -> IntervalCollection<T, U>
 //Vec<BaseInterval<T, U>>
 where
-    T: Num + PartialOrd + Clone + Hash + Copy + Eq,
+    T: Num + PartialOrd + Clone + Hash + Copy + Eq + Display,
     U: Num
         + PartialOrd
         + Default
@@ -59,7 +60,8 @@ where
         + Clone
         + Copy
         + ToPrimitive
-        + std::iter::Sum,
+        + std::iter::Sum
+        + Display,
 {
     let endpoints: Vec<(T, U)> = base_intervals_to_points(raw_ivs);
 
