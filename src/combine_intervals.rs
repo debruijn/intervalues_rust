@@ -253,4 +253,21 @@ mod tests {
         let that = combine_as_set(that);
         assert_eq!(this, that);
     }
+
+    #[test]
+    fn test_as_set_both_impls() {
+        let that: Vec<[i64; 3]> = vec![[0, 2, 1], [1, 3, 2]];
+        let that = that
+            .iter()
+            .map(|x| Interval::new(x[0], x[1], x[2]))
+            .collect();
+        let this = combine_as_set(that);
+        let that: Vec<[i64; 3]> = vec![[0, 2, 1], [1, 3, 2]];
+        let that = that
+            .iter()
+            .map(|x| Interval::new(x[0], x[1], x[2]))
+            .collect();
+        let that = combine_intervals(that).to_vec_as_set();
+        assert_eq!(this, that);
+    }
 }
