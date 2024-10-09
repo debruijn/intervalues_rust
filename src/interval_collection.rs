@@ -1,10 +1,10 @@
-use crate::BaseInterval;
+use crate::{BaseInterval, Interval};
 use num_traits::{Num, ToPrimitive};
 use safecast::CastInto;
 
 #[derive(Clone, Hash, Eq, PartialEq, Debug)]
 pub struct IntervalCollection<T: Num, U: Num> {
-    intervals: Vec<BaseInterval<T, U>>,
+    intervals: Vec<Interval<T, U>>,
 }
 
 impl<T, U> IntervalCollection<T, U>
@@ -60,7 +60,7 @@ where
         U::zero()
     }
 
-    pub fn contains_interval(&self, interval: BaseInterval<T, U>) -> bool {
+    pub fn contains_interval(&self, interval: Interval<T, U>) -> bool {
         let mut to_check = interval.clone();
         for interval in self.intervals.iter() {
             if interval.superset(to_check) {
@@ -71,7 +71,7 @@ where
                 continue;
             } else {
                 to_check =
-                    BaseInterval::new(interval.get_ub(), to_check.get_ub(), to_check.get_value());
+                    Interval::new(interval.get_ub(), to_check.get_ub(), to_check.get_value());
             }
         }
         false
@@ -79,13 +79,13 @@ where
 
     pub fn get_value_of_interval_by_parts(
         &self,
-        interval: BaseInterval<T, U>,
+        interval: Interval<T, U>,
     ) -> IntervalCollection<T, U> {
         let mut values = Vec::new();
         let mut to_check = interval.clone();
         for interval in self.intervals.iter() {
             if interval.superset(to_check) {
-                let new = BaseInterval::new(
+                let new = Interval::new(
                     to_check.get_lb(),
                     to_check.get_ub(),
                     interval.get_value() / to_check.get_value(),
@@ -98,13 +98,13 @@ where
                 continue;
             } else {
                 to_check =
-                    BaseInterval::new(interval.get_ub(), to_check.get_ub(), to_check.get_value());
+                    Interval::new(interval.get_ub(), to_check.get_ub(), to_check.get_value());
             }
         }
         IntervalCollection::from_vec(values)
     }
 
-    pub fn get_partially_overlaps_interval(&self, other: &BaseInterval<T, U>) -> bool {
+    pub fn get_partially_overlaps_interval(&self, other: &Interval<T, U>) -> bool {
         for interval in self.intervals.iter() {
             if interval.overlaps(*other) {
                 return true;
@@ -122,19 +122,19 @@ where
         false
     }
 
-    pub fn from_vec(vec: Vec<BaseInterval<T, U>>) -> Self {
+    pub fn from_vec(vec: Vec<Interval<T, U>>) -> Self {
         IntervalCollection { intervals: vec }
     }
 
-    pub fn to_vec_owned(self) -> Vec<BaseInterval<T, U>> {
+    pub fn to_vec_owned(self) -> Vec<Interval<T, U>> {
         self.intervals
     }
 
-    pub fn to_vec(self) -> Vec<BaseInterval<T, U>> {
+    pub fn to_vec(self) -> Vec<Interval<T, U>> {
         self.intervals.clone()
     }
 
-    pub fn to_vec_as_set(&self) -> Vec<BaseInterval<T, U>> {
+    pub fn to_vec_as_set(&self) -> Vec<BaseInterval<T>> {
         // TODO: create unvalued BI (no U)
         let mut new = Vec::new();
         if self.len() == 0 {
@@ -142,14 +142,14 @@ where
         }
         let mut this_interval = self.intervals[0];
         for next_interval in self.intervals[1..].iter() {
-            if this_interval.can_join_ign_value(next_interval) {
+            if this_interval.can_join_as_set(next_interval) {
                 this_interval = this_interval.join_ign_value(*next_interval);
             } else {
-                new.push(this_interval);
+                new.push(this_interval.to_base());
                 this_interval = *next_interval;
             }
         }
-        new.push(this_interval);
+        new.push(this_interval.to_base());
         new
     }
 }
@@ -172,7 +172,7 @@ where
     T: Num + PartialOrd + Clone + Copy,
     U: Num + PartialOrd + Clone + Copy + ToPrimitive + std::iter::Sum,
 {
-    pub fn to_vec_as_counter(&self) -> Vec<BaseInterval<T, usize>> {
+    pub fn to_vec_as_counter(&self) -> Vec<Interval<T, usize>> {
         let mut new = Vec::new();
         if self.len() == 0 {
             return new;
