@@ -1,10 +1,10 @@
 use intervalues;
 use intervalues::BaseInterval;
+use intervalues::IntFloat;
 use num_traits::ToPrimitive;
 use rand::Rng;
 use rust_decimal::Decimal;
 use std::time::Instant;
-use intervalues::IntFloat;
 
 fn main() {
     let mut rng = rand::thread_rng();

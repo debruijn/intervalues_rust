@@ -1,25 +1,25 @@
+use num_traits::{Num, One, Pow, ToPrimitive, Zero};
+use std::fmt;
 use std::fmt::{Debug, Formatter};
 use std::num::ParseIntError;
 use std::ops::{Add, AddAssign, Div, Mul, Rem, Sub, SubAssign};
-use num_traits::{Num, One, Pow, ToPrimitive, Zero};
-use std::fmt;
-
 
 #[derive(Clone, Copy, Hash, Eq, PartialEq, PartialOrd, Default)]
 pub struct IntFloat {
     base: isize,
-    pow: isize
+    pow: isize,
 }
-
 
 impl IntFloat {
     pub fn new(base: isize, pow: isize) -> Self {
-        IntFloat {base, pow}
+        IntFloat { base, pow }
     }
 
     pub fn from(float: f32, decimals: isize) -> Self {
-        IntFloat {base: (float * isize::pow(10, decimals as u32) as f32).round() as isize,
-            pow: decimals}
+        IntFloat {
+            base: (float * isize::pow(10, decimals as u32) as f32).round() as isize,
+            pow: decimals,
+        }
     }
 
     pub fn set_base(mut self, new_base: isize) {
@@ -39,7 +39,6 @@ impl IntFloat {
     }
 }
 
-
 impl Debug for IntFloat {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.print())
@@ -51,11 +50,15 @@ impl Add<Self> for IntFloat {
 
     fn add(self, rhs: Self) -> IntFloat {
         if rhs.pow > self.pow {
-            IntFloat {base: self.base * isize::pow(10, (rhs.pow - self.pow) as u32) + rhs.base,
-                pow: rhs.pow}
+            IntFloat {
+                base: self.base * isize::pow(10, (rhs.pow - self.pow) as u32) + rhs.base,
+                pow: rhs.pow,
+            }
         } else {
-            IntFloat {base: rhs.base * isize::pow(10, (self.pow - rhs.pow) as u32) + self.base,
-                pow: self.pow}
+            IntFloat {
+                base: rhs.base * isize::pow(10, (self.pow - rhs.pow) as u32) + self.base,
+                pow: self.pow,
+            }
         }
     }
 }
@@ -78,7 +81,7 @@ impl AddAssign for IntFloat {
 
 impl Zero for IntFloat {
     fn zero() -> Self {
-        IntFloat{base: 0, pow: 0}
+        IntFloat { base: 0, pow: 0 }
     }
 
     fn is_zero(&self) -> bool {
@@ -90,13 +93,16 @@ impl Mul<Self> for IntFloat {
     type Output = IntFloat;
 
     fn mul(self, rhs: Self) -> IntFloat {
-        IntFloat {base: self.base * rhs.base, pow: self.pow + rhs.pow}
+        IntFloat {
+            base: self.base * rhs.base,
+            pow: self.pow + rhs.pow,
+        }
     }
 }
 
 impl One for IntFloat {
     fn one() -> Self {
-        IntFloat{base: 1, pow: 0}
+        IntFloat { base: 1, pow: 0 }
     }
 }
 
@@ -104,7 +110,10 @@ impl Sub<Self> for IntFloat {
     type Output = IntFloat;
 
     fn sub(self, rhs: Self) -> IntFloat {
-        let new_rhs = IntFloat {base: -rhs.base, pow: rhs.pow};
+        let new_rhs = IntFloat {
+            base: -rhs.base,
+            pow: rhs.pow,
+        };
         self.add(new_rhs)
     }
 }
@@ -117,12 +126,14 @@ impl SubAssign for IntFloat {
     }
 }
 
-
 impl Div<Self> for IntFloat {
     type Output = IntFloat;
 
     fn div(self, rhs: Self) -> IntFloat {
-        IntFloat {base: self.base / rhs.base, pow: self.pow - rhs.pow}
+        IntFloat {
+            base: self.base / rhs.base,
+            pow: self.pow - rhs.pow,
+        }
     }
 }
 
@@ -141,9 +152,12 @@ impl Num for IntFloat {
         let this_base = isize::from_str_radix(str, radix);
         let this_base = match this_base {
             Err(parse_int_error) => return Err(parse_int_error),
-            Ok(num) => num
+            Ok(num) => num,
         };
-        Ok(IntFloat {base: this_base, pow: 0})
+        Ok(IntFloat {
+            base: this_base,
+            pow: 0,
+        })
     }
 }
 
@@ -166,7 +180,7 @@ impl ToPrimitive for IntFloat {
 }
 
 impl std::iter::Sum for IntFloat {
-    fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
         let mut this = IntFloat::one();
         for i in iter {
             this += i;
