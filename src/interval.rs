@@ -224,9 +224,9 @@ where
 
 #[cfg(test)]
 mod tests {
-    use num_traits::One;
-    use crate::IntFloat;
     use super::*;
+    use crate::IntFloat;
+    use num_traits::One;
 
     #[test]
     fn test_create_int_interval() {
@@ -259,7 +259,11 @@ mod tests {
 
     #[test]
     fn test_create_intfloat_interval() {
-        let a = Interval::new(IntFloat::one(), IntFloat::from(3.0, 0), IntFloat::from(3.0, 0));
+        let a = Interval::new(
+            IntFloat::one(),
+            IntFloat::from(3.0, 0),
+            IntFloat::from(3.0, 0),
+        );
         assert_eq!(a.len(), IntFloat::from(2.0, 0));
         assert_eq!(a.get_value(), IntFloat::from(3.0, 0));
         assert_eq!(a.get_total_value(), IntFloat::from(6.0, 0))
@@ -267,7 +271,7 @@ mod tests {
 
     #[test]
     fn test_bounds() {
-        let a = Interval::new(3, 7,  2);
+        let a = Interval::new(3, 7, 2);
         assert_eq!(a.to_tuple(), (3, 7, 2));
         assert_eq!(a.get_bounds(), (3, 7));
         assert_eq!(a.get_lb(), 3);
@@ -325,7 +329,7 @@ mod tests {
         assert!(!a.can_join(&c));
 
         let d = Interval::new(0, 2, 2);
-        let e = Interval::new(2,6, 2);
+        let e = Interval::new(2, 6, 2);
 
         assert_eq!(a.join(a), d);
         assert_eq!(c.join(b), e);
@@ -343,9 +347,9 @@ mod tests {
         assert!(!a.can_join_as_set(&c));
 
         let d = BaseInterval::new(0, 4);
-        let e = BaseInterval::new(1,6);
+        let e = BaseInterval::new(1, 6);
         let d2 = Interval::new(0, 4, 1);
-        let e2 = Interval::new(1,6, 1);
+        let e2 = Interval::new(1, 6, 1);
 
         assert_eq!(a.join_as_set(b), d);
         assert_eq!(c.join_as_set(b), e);
@@ -353,7 +357,6 @@ mod tests {
         assert_eq!(a.join_ign_value(b), d2);
         assert_eq!(c.join_ign_value(b), e2);
     }
-
 
     #[test]
     fn test_val_to_count() {
@@ -372,5 +375,4 @@ mod tests {
         let b = BaseInterval::new(0, 2);
         assert_eq!(a.to_base(), b)
     }
-
 }

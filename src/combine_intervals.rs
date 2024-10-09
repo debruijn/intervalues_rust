@@ -89,13 +89,15 @@ mod tests {
 
     #[test]
     fn test_with_overlap() {
-        let this: Vec<[i64; 3]> = vec!([0, 2, 1], [1, 3, 2]);
-        let this = this.iter()
+        let this: Vec<[i64; 3]> = vec![[0, 2, 1], [1, 3, 2]];
+        let this = this
+            .iter()
             .map(|x| Interval::new(x[0], x[1], x[2]))
             .collect();
         let this = combine_intervals(this);
-        let that: Vec<[i64; 3]> = vec!([0, 1, 1], [1, 2, 3], [2, 3, 2]);
-        let that = that.iter()
+        let that: Vec<[i64; 3]> = vec![[0, 1, 1], [1, 2, 3], [2, 3, 2]];
+        let that = that
+            .iter()
             .map(|x| Interval::new(x[0], x[1], x[2]))
             .collect();
         let that = IntervalCollection::from_vec(that);
@@ -104,13 +106,15 @@ mod tests {
 
     #[test]
     fn test_without_overlap() {
-        let this: Vec<[i64; 3]> = vec!([0, 1, 1], [2, 3, 2]);
-        let this = this.iter()
+        let this: Vec<[i64; 3]> = vec![[0, 1, 1], [2, 3, 2]];
+        let this = this
+            .iter()
             .map(|x| Interval::new(x[0], x[1], x[2]))
             .collect();
         let this = IntervalCollection::from_vec(this);
-        let that: Vec<[i64; 3]> = vec!([0, 1, 1], [2, 3, 2]);
-        let that = that.iter()
+        let that: Vec<[i64; 3]> = vec![[0, 1, 1], [2, 3, 2]];
+        let that = that
+            .iter()
             .map(|x| Interval::new(x[0], x[1], x[2]))
             .collect();
         let that = combine_intervals(that);
@@ -119,13 +123,15 @@ mod tests {
 
     #[test]
     fn test_created_overlap() {
-        let this: Vec<[i64; 3]> = vec!([0, 1, 2], [2, 3, -2]);
-        let this = this.iter()
+        let this: Vec<[i64; 3]> = vec![[0, 1, 2], [2, 3, -2]];
+        let this = this
+            .iter()
             .map(|x| Interval::new(x[0], x[1], x[2]))
             .collect();
         let this = IntervalCollection::from_vec(this);
-        let that: Vec<[i64; 3]> = vec!([0, 2, 2], [1, 3, -2]);
-        let that = that.iter()
+        let that: Vec<[i64; 3]> = vec![[0, 2, 2], [1, 3, -2]];
+        let that = that
+            .iter()
             .map(|x| Interval::new(x[0], x[1], x[2]))
             .collect();
         let that = combine_intervals(that);

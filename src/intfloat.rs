@@ -181,7 +181,6 @@ impl std::iter::Sum for IntFloat {
     }
 }
 
-
 impl PartialEq for IntFloat {
     fn eq(&self, other: &Self) -> bool {
         if other.pow > self.pow {
@@ -193,7 +192,6 @@ impl PartialEq for IntFloat {
 }
 
 // TODO: test equality when pow is specificied differently, eg. (100,2) == (1,0)
-
 
 #[cfg(test)]
 mod tests {
@@ -217,7 +215,8 @@ mod tests {
     }
 
     #[test]
-    fn test_print() {  // Accuracy of conversion will be tested in respective conversion function
+    fn test_print() {
+        // Accuracy of conversion will be tested in respective conversion function
         let this = IntFloat::new(534, 2);
         assert!(this.print().contains('.'));
         let this = IntFloat::new(534, 0);
@@ -227,7 +226,8 @@ mod tests {
     }
 
     #[test]
-    fn test_add() {  // Accuracy of conversion will be tested in respective conversion function
+    fn test_add() {
+        // Accuracy of conversion will be tested in respective conversion function
         let this = IntFloat::new(534, -2);
         let that = IntFloat::new(1068, -2);
         assert_eq!(this + this, that);
@@ -243,7 +243,8 @@ mod tests {
     }
 
     #[test]
-    fn test_add_assign() {  // Accuracy of conversion will be tested in respective conversion function
+    fn test_add_assign() {
+        // Accuracy of conversion will be tested in respective conversion function
         let mut this = IntFloat::new(534, -2);
         this += this;
         let that = IntFloat::new(1068, -2);
@@ -251,7 +252,8 @@ mod tests {
     }
 
     #[test]
-    fn test_sub() {  // Accuracy of conversion will be tested in respective conversion function
+    fn test_sub() {
+        // Accuracy of conversion will be tested in respective conversion function
         let this = IntFloat::new(534, -2);
         let that = IntFloat::new(1068, -2);
         assert_eq!(that - this, this);
@@ -267,7 +269,8 @@ mod tests {
     }
 
     #[test]
-    fn test_sub_assign() {  // Accuracy of conversion will be tested in respective conversion function
+    fn test_sub_assign() {
+        // Accuracy of conversion will be tested in respective conversion function
         let this = IntFloat::new(534, -2);
         let mut that = IntFloat::new(1068, -2);
         that -= this;
@@ -275,7 +278,8 @@ mod tests {
     }
 
     #[test]
-    fn test_mul() {  // Accuracy of conversion will be tested in respective conversion function
+    fn test_mul() {
+        // Accuracy of conversion will be tested in respective conversion function
         let this = IntFloat::new(500, -2);
         let that = IntFloat::new(250000, -4);
         assert_eq!(this * this, that);
@@ -286,7 +290,8 @@ mod tests {
     }
 
     #[test]
-    fn test_div() {  // Accuracy of conversion will be tested in respective conversion function
+    fn test_div() {
+        // Accuracy of conversion will be tested in respective conversion function
         let this = IntFloat::new(500, -2);
         let that = IntFloat::new(250000, -4);
         assert_eq!(that / this, this);
@@ -297,16 +302,17 @@ mod tests {
     }
 
     #[test]
-    fn test_rem() {  // Accuracy of conversion will be tested in respective conversion function
+    fn test_rem() {
+        // Accuracy of conversion will be tested in respective conversion function
         let this = IntFloat::new(499, -2);
         let that = IntFloat::new(250000, -4);
         let such = IntFloat::new(1, -4);
-        assert_eq!( that - (that / this) * this, such);
+        assert_eq!(that - (that / this) * this, such);
 
         let this = IntFloat::new(499, 2);
         let that = IntFloat::new(250000, 4);
         let such = IntFloat::new(1, 4);
-        assert_eq!( that - (that / this) * this, such);
+        assert_eq!(that - (that / this) * this, such);
     }
 
     #[test]

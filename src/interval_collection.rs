@@ -121,7 +121,8 @@ where
         false
     }
 
-    pub fn get_value_of_interval_by_parts( // TODO write test for this and test all cases
+    pub fn get_value_of_interval_by_parts(
+        // TODO write test for this and test all cases
         &self,
         interval: Interval<T, U>,
     ) -> IntervalCollection<T, U> {
@@ -245,9 +246,10 @@ mod tests {
     use super::*;
     use crate::combine_intervals;
 
-    fn get_input() -> Vec<Interval<i64, i64>>{
-        let input: Vec<[i64; 3]> = vec!([0, 2, 1], [1, 3, 2]);
-        let input = input.iter()
+    fn get_input() -> Vec<Interval<i64, i64>> {
+        let input: Vec<[i64; 3]> = vec![[0, 2, 1], [1, 3, 2]];
+        let input = input
+            .iter()
             .map(|x| Interval::new(x[0], x[1], x[2]))
             .collect();
         input
@@ -308,14 +310,11 @@ mod tests {
         assert_eq!(this.total_value(), 6);
     }
 
-
-
     #[test]
     fn test_len() {
         let this = IntervalCollection::from_vec(get_input());
         assert_eq!(this.len(), 2);
         let this = combine_intervals::combine_intervals(get_input());
         assert_eq!(this.len(), 3);
-
     }
 }

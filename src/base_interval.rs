@@ -151,9 +151,9 @@ where
 
 #[cfg(test)]
 mod tests {
-    use num_traits::One;
-    use crate::IntFloat;
     use super::*;
+    use crate::IntFloat;
+    use num_traits::One;
 
     #[test]
     fn test_create_int_interval() {
@@ -238,10 +238,9 @@ mod tests {
         assert!(!a.can_join(c));
 
         let d = BaseInterval::new(0, 4);
-        let e = BaseInterval::new(1,6);
+        let e = BaseInterval::new(1, 6);
 
         assert_eq!(a.join(b), d);
         assert_eq!(c.join(b), e);
     }
-
 }
