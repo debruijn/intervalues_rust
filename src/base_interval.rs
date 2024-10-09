@@ -105,7 +105,7 @@ where
     }
 
     pub fn left_overlaps(&self, other: &BaseInterval<T>) -> bool {
-        if (self.lb <= other.lb) & (self.ub <= other.ub) {
+        if (self.lb <= other.lb) & (self.ub <= other.ub) & (other.lb <= self.ub) {
             true
         } else {
             false
@@ -130,8 +130,6 @@ where
     }
 
     pub fn join(self, other: BaseInterval<T>) -> BaseInterval<T> {
-        // Two options to enter this -> same range, or bordering range but same val
-        // So test (and if so, return for) option 1, and then continue with option 2
         if (self.ub == other.ub) && (self.lb == other.lb) {
             return BaseInterval::new(self.lb, self.ub);
         }
@@ -154,6 +152,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::IntFloat;
+    use num_traits::One;
 
     #[test]
     fn test_create_int_interval() {
@@ -164,9 +164,83 @@ mod tests {
 
     #[test]
     fn test_create_float_interval() {
-        let a = BaseInterval::new(1.0, 4.0);
+        let a = BaseInterval::new(1.2, 4.2);
         assert_eq!(a.len(), 3.0);
         assert_eq!(a.get_value(), 1.0);
         assert_eq!(a.get_total_value(), 3.0)
+    }
+
+    #[test]
+    fn test_create_intfloat_interval() {
+        let a = BaseInterval::new(IntFloat::one(), IntFloat::from(2.0, 0));
+        assert_eq!(a.len(), IntFloat::one());
+        assert_eq!(a.get_value(), IntFloat::one());
+        assert_eq!(a.get_total_value(), IntFloat::one())
+    }
+
+    #[test]
+    fn test_bounds() {
+        let a = BaseInterval::new(3, 7);
+        assert_eq!(a.to_tuple(), (3, 7));
+        assert_eq!(a.get_bounds(), (3, 7));
+        assert_eq!(a.get_lb(), 3);
+        assert_eq!(a.get_ub(), 7);
+        assert_eq!(a.get_width(), 4);
+    }
+
+    #[test]
+    fn test_total_value() {
+        let a = BaseInterval::new(3, 7);
+        assert_eq!(a.get_total_value(), 4);
+        assert_eq!(a.get_value(), 1);
+    }
+
+    #[test]
+    fn test_contains() {
+        let a = BaseInterval::new(3, 7);
+        assert!(a.contains(4));
+        assert!(a.contains(3));
+        assert!(a.contains(7));
+        assert!(!a.contains(0));
+    }
+
+    #[test]
+    fn test_superset_subset() {
+        let a = BaseInterval::new(3, 7);
+        let b = BaseInterval::new(4, 6);
+
+        assert!(a.superset(b));
+        assert!(b.subset(a));
+        assert!(!a.subset(b));
+        assert!(!b.superset(a));
+    }
+
+    #[test]
+    fn test_overlaps() {
+        let a = BaseInterval::new(3, 6);
+        let b = BaseInterval::new(4, 7);
+
+        assert!(a.left_overlaps(&b));
+        assert!(b.right_overlaps(&a));
+        assert!(!a.right_overlaps(&b));
+        assert!(!b.left_overlaps(&a));
+    }
+
+    #[test]
+    fn test_join() {
+        let a = BaseInterval::new(0, 2);
+        let b = BaseInterval::new(1, 4);
+        let c = BaseInterval::new(3, 6);
+
+        assert!(a.can_join(b));
+        assert!(c.can_join(b));
+        assert!(b.can_join(c));
+        assert!(!a.can_join(c));
+
+        let d = BaseInterval::new(0, 4);
+        let e = BaseInterval::new(1, 6);
+
+        assert_eq!(a.join(b), d);
+        assert_eq!(c.join(b), e);
     }
 }
