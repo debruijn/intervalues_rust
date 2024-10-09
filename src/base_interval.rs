@@ -2,19 +2,20 @@ use num_traits::{Num, ToPrimitive};
 use std::cmp::PartialOrd;
 
 #[derive(Clone, Copy, Hash, Eq, PartialEq, Debug)]
-pub struct BaseInterval<T: Num, U: Num> {
+pub struct Interval<T: Num, U: Num> {
     lb: T,
     ub: T,
     val: U,
 }
 
-impl<T, U> Default for BaseInterval<T, U>
+
+impl<T, U> Default for Interval<T, U>
 where
     T: Num + PartialOrd + Clone,
     U: Num,
 {
     fn default() -> Self {
-        BaseInterval {
+        Interval {
             lb: T::zero(),
             ub: T::one(),
             val: U::one(),
@@ -22,16 +23,16 @@ where
     }
 }
 
-impl<T, U> BaseInterval<T, U>
+impl<T, U> Interval<T, U>
 where
     T: Num + PartialOrd + Clone,
     U: Num + PartialOrd,
 {
     pub fn new(lb: T, ub: T, val: U) -> Self {
         if ub > lb {
-            BaseInterval { lb, ub, val }
+            Interval { lb, ub, val }
         } else {
-            BaseInterval {
+            Interval {
                 lb: ub,
                 ub: lb,
                 val,
@@ -76,7 +77,7 @@ where
     }
 
     // TODO explore if T can be U here
-    pub fn superset(self, other: BaseInterval<T, U>) -> bool {
+    pub fn superset(self, other: Interval<T, U>) -> bool {
         if (other.ub <= self.ub) && (other.lb >= self.lb) {
             true
         } else {
@@ -84,11 +85,11 @@ where
         }
     }
 
-    pub fn subset(self, other: BaseInterval<T, U>) -> bool {
+    pub fn subset(self, other: Interval<T, U>) -> bool {
         other.superset(self)
     }
 
-    pub fn left_overlaps(&self, other: &BaseInterval<T, U>) -> bool {
+    pub fn left_overlaps(&self, other: &Interval<T, U>) -> bool {
         if (self.lb <= other.lb) & (self.ub <= other.ub) {
             true
         } else {
@@ -96,15 +97,15 @@ where
         }
     }
 
-    pub fn right_overlaps(self, other: &BaseInterval<T, U>) -> bool {
+    pub fn right_overlaps(self, other: &Interval<T, U>) -> bool {
         other.left_overlaps(&self)
     }
 
-    pub fn overlaps(self, other: BaseInterval<T, U>) -> bool {
+    pub fn overlaps(self, other: Interval<T, U>) -> bool {
         self.left_overlaps(&other) || self.right_overlaps(&other)
     }
 
-    pub fn can_join(self, other: &BaseInterval<T, U>) -> bool {
+    pub fn can_join(self, other: &Interval<T, U>) -> bool {
         if ((self.ub == other.lb) || (other.ub == self.lb)) && (self.val == other.val) {
             true
         } else if (self.ub == other.ub) && (self.lb == other.lb) {
@@ -114,11 +115,11 @@ where
         }
     }
 
-    pub fn join(self, other: BaseInterval<T, U>) -> BaseInterval<T, U> {
+    pub fn join(self, other: Interval<T, U>) -> Interval<T, U> {
         // Two options to enter this -> same range, or bordering range but same val
         // So test (and if so, return for) option 1, and then continue with option 2
         if (self.ub == other.ub) && (self.lb == other.lb) {
-            return BaseInterval::new(self.lb, self.ub, self.val + other.val);
+            return Interval::new(self.lb, self.ub, self.val + other.val);
         }
 
         // Option 2 from above
@@ -127,10 +128,10 @@ where
         } else {
             (other.lb, self.ub)
         };
-        BaseInterval::new(lb, ub, self.val)
+        Interval::new(lb, ub, self.val)
     }
 
-    pub fn can_join_ign_value(self, other: &BaseInterval<T, U>) -> bool {
+    pub fn can_join_ign_value(self, other: &Interval<T, U>) -> bool {
         if (self.ub == other.lb) || (other.ub == self.lb) {
             true
         } else {
@@ -138,7 +139,7 @@ where
         }
     }
 
-    pub fn join_ign_value(self, other: BaseInterval<T, U>) -> BaseInterval<T, U> {
+    pub fn join_ign_value(self, other: Interval<T, U>) -> Interval<T, U> {
         let lb = if self.lb < other.lb {
             self.lb
         } else {
@@ -149,11 +150,11 @@ where
         } else {
             other.ub
         };
-        BaseInterval::new(lb, ub, U::one())
+        Interval::new(lb, ub, U::one())
     }
 }
 
-impl<T> BaseInterval<T, T>
+impl<T> Interval<T, T>
 where
     T: Num,
 {
@@ -162,17 +163,17 @@ where
     }
 }
 
-impl<T, U> BaseInterval<T, U>
+impl<T, U> Interval<T, U>
 where
     T: Num + Clone + PartialOrd,
     U: Num + PartialOrd + ToPrimitive,
 {
-    pub fn val_to_count(self) -> BaseInterval<T, usize> {
+    pub fn val_to_count(self) -> Interval<T, usize> {
         // To test if this works
         if self.val >= U::one() {
-            BaseInterval::new(self.lb, self.ub, self.val.to_usize().unwrap())
+            Interval::new(self.lb, self.ub, self.val.to_usize().unwrap())
         } else {
-            BaseInterval::new(self.lb, self.ub, 0)
+            Interval::new(self.lb, self.ub, 0)
         }
     }
 }
@@ -183,14 +184,14 @@ mod tests {
 
     #[test]
     fn test_create_int_interval() {
-        let a = BaseInterval::new(1, 2, 1);
+        let a = Interval::new(1, 2, 1);
         assert_eq!(a.len(), 1);
         assert_eq!(a.get_value(), 1)
     }
 
     #[test]
     fn test_create_float_interval() {
-        let a = BaseInterval::new(1.0, 4.0, 2.0);
+        let a = Interval::new(1.0, 4.0, 2.0);
         assert_eq!(a.len(), 3.0);
         assert_eq!(a.get_value(), 2.0);
         assert_eq!(a.get_total_value(), 6.0)
@@ -198,27 +199,27 @@ mod tests {
 
     #[test]
     fn test_create_mixed_interval() {
-        let a = BaseInterval::new(1.0, 2.0, 1);
+        let a = Interval::new(1.0, 2.0, 1);
         assert_eq!(a.len(), 1.0);
         assert_eq!(a.get_value(), 1)
     }
 
     #[test]
     fn test_create_mixed_interval2() {
-        let a = BaseInterval::new(1, 2, 1.0);
+        let a = Interval::new(1, 2, 1.0);
         assert_eq!(a.len(), 1);
         assert_eq!(a.get_value(), 1.0)
     }
 
     #[test]
     fn test_val_to_count() {
-        let a = BaseInterval::new(1, 2, 1.5);
+        let a = Interval::new(1, 2, 1.5);
         assert_eq!(a.val_to_count().get_value(), 1)
     }
 
     #[test]
     fn test_val_to_count2() {
-        let a = BaseInterval::new(1, 2, 1);
+        let a = Interval::new(1, 2, 1);
         assert_eq!(a.val_to_count().get_value(), 1)
     }
 }

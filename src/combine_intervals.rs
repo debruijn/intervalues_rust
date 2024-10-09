@@ -1,4 +1,4 @@
-use crate::base_interval::BaseInterval;
+use crate::base_interval::Interval;
 use crate::IntervalCollection;
 use defaultmap::DefaultHashMap;
 use itertools::Itertools;
@@ -6,7 +6,7 @@ use num_traits::{Num, ToPrimitive};
 use std::hash::Hash;
 use std::ops::{AddAssign, SubAssign};
 
-fn base_intervals_to_points<T, U>(input: Vec<BaseInterval<T, U>>) -> Vec<(T, U)>
+fn base_intervals_to_points<T, U>(input: Vec<Interval<T, U>>) -> Vec<(T, U)>
 where
     T: Num + PartialOrd + Clone + Eq + Hash + Copy,
     U: Num + PartialOrd + Default + AddAssign + SubAssign + Clone + Copy,
@@ -34,20 +34,20 @@ where
 /// ```
 /// use std::collections::HashMap;
 /// use intervalues;
-/// use intervalues::{BaseInterval, IntervalCollection};
+/// use intervalues::{Interval, IntervalCollection};
 ///
 /// // Two intervals, from 0 to 2 with count 1 and 1 to 3 with count 2
 /// let input: Vec<[i64; 3]> = vec!([0, 2, 1], [1, 3, 2]);
 /// let input = input.iter()
-///     .map(|x| BaseInterval::new(x[0], x[1], x[2]))
+///     .map(|x| Interval::new(x[0], x[1], x[2]))
 ///     .collect();
 /// let out: IntervalCollection<i64,i64> = intervalues::combine_intervals(input);
 ///
 /// // 'out' = {(0, 1, 1), (2, 3, 2), (1, 2, 3)}
-/// assert_eq!(out.to_vec_as_counter()[0], BaseInterval::default());
-/// assert_eq!(out.to_vec_owned()[1], BaseInterval::new(1, 2, 3));
+/// assert_eq!(out.to_vec_as_counter()[0], Interval::default());
+/// assert_eq!(out.to_vec_owned()[1], Interval::new(1, 2, 3));
 /// ```
-pub fn combine_intervals<T, U>(raw_ivs: Vec<BaseInterval<T, U>>) -> IntervalCollection<T, U>
+pub fn combine_intervals<T, U>(raw_ivs: Vec<Interval<T, U>>) -> IntervalCollection<T, U>
 //Vec<BaseInterval<T, U>>
 where
     T: Num + PartialOrd + Clone + Hash + Copy + Eq,
@@ -75,7 +75,7 @@ where
     let mut out = Vec::new();
     for (lb, ub) in new_map.iter().tuple_windows() {
         if lb.1 != U::zero() {
-            out.push(BaseInterval::new(lb.0, ub.0, lb.1));
+            out.push(Interval::new(lb.0, ub.0, lb.1));
         }
     }
     IntervalCollection::from_vec(out)

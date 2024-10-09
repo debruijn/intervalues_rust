@@ -1,5 +1,5 @@
 use intervalues;
-use intervalues::BaseInterval;
+use intervalues::Interval;
 use num_traits::ToPrimitive;
 use rand::Rng;
 use rust_decimal::Decimal;
@@ -20,7 +20,7 @@ fn main() {
     let mut input = Vec::new();
     let n = 1000000;
     for _ in 0..n {
-        input.push(BaseInterval::new(
+        input.push(Interval::new(
             rng.gen_range(0..10),
             rng.gen_range(0..10),
             1,
@@ -38,7 +38,7 @@ fn main() {
     let mut input = Vec::new();
     let n = 1000000;
     for _ in 0..n {
-        input.push(BaseInterval::new(
+        input.push(Interval::new(
             rng.gen_range(0..10),
             rng.gen_range(0..10),
             // 1),
@@ -57,7 +57,7 @@ fn main() {
     let mut input = Vec::new();
     let n = 1000000;
     for _ in 0..n {
-        input.push(BaseInterval::new(
+        input.push(Interval::new(
             Decimal::from_f32_retain(0.5 + rng.gen_range(0..10).to_f32().unwrap()).unwrap(),
             Decimal::from_f32_retain(0.5 + rng.gen_range(0..10).to_f32().unwrap()).unwrap(),
             Decimal::from_f32_retain(1.5).unwrap(),
