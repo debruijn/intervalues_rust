@@ -4,7 +4,7 @@ use std::fmt::{Debug, Display, Formatter};
 use std::num::ParseIntError;
 use std::ops::{Add, AddAssign, Div, Mul, Rem, Sub, SubAssign};
 
-#[derive(Clone, Copy, Hash, Eq, PartialEq, PartialOrd, Default, Debug)]
+#[derive(Clone, Copy, Hash, Eq, PartialOrd, Default, Debug)]
 pub struct IntFloat {
     base: isize,
     pow: isize,
@@ -20,14 +20,6 @@ impl IntFloat {
             base: (float * isize::pow(10, decimals as u32) as f32).round() as isize,
             pow: decimals,
         }
-    }
-
-    pub fn set_base(mut self, new_base: isize) {
-        self.base = new_base;
-    }
-
-    pub fn set_pow(mut self, new_pow: isize) {
-        self.pow = new_pow;
     }
 
     pub fn print(self) -> String {
@@ -186,5 +178,165 @@ impl std::iter::Sum for IntFloat {
             this += i;
         }
         this
+    }
+}
+
+
+impl PartialEq for IntFloat {
+    fn eq(&self, other: &Self) -> bool {
+        if other.pow > self.pow {
+            other.base == self.base * isize::pow(10, (other.pow - self.pow) as u32)
+        } else {
+            self.base == other.base * isize::pow(10, (self.pow - other.pow) as u32)
+        }
+    }
+}
+
+// TODO: test equality when pow is specificied differently, eg. (100,2) == (1,0)
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new() {
+        let this = IntFloat::new(534, 2);
+        assert_eq!(this.base, 534);
+        assert_eq!(this.pow, 2);
+    }
+
+    #[test]
+    fn test_from() {
+        let this = IntFloat::from(5.34, 2);
+        let that = IntFloat::new(534, 2);
+        assert_eq!(this, that);
+
+        let this = IntFloat::from(5.34234, 2);
+        assert_eq!(this, that);
+    }
+
+    #[test]
+    fn test_print() {  // Accuracy of conversion will be tested in respective conversion function
+        let this = IntFloat::new(534, 2);
+        assert!(this.print().contains('.'));
+        let this = IntFloat::new(534, 0);
+        assert!(!this.print().contains('.'));
+        let this = IntFloat::new(534, -2);
+        assert!(!this.print().contains('.'));
+    }
+
+    #[test]
+    fn test_add() {  // Accuracy of conversion will be tested in respective conversion function
+        let this = IntFloat::new(534, -2);
+        let that = IntFloat::new(1068, -2);
+        assert_eq!(this + this, that);
+
+        let this = IntFloat::new(534, -2);
+        let that = IntFloat::new(1068, -2);
+        assert_eq!(this + this, that);
+
+        let this = IntFloat::new(534, 0);
+        let this_too = IntFloat::new(100, 2);
+        let that = IntFloat::new(53500, 2);
+        assert_eq!(this + this_too, that);
+    }
+
+    #[test]
+    fn test_add_assign() {  // Accuracy of conversion will be tested in respective conversion function
+        let mut this = IntFloat::new(534, -2);
+        this += this;
+        let that = IntFloat::new(1068, -2);
+        assert_eq!(this, that);
+    }
+
+    #[test]
+    fn test_sub() {  // Accuracy of conversion will be tested in respective conversion function
+        let this = IntFloat::new(534, -2);
+        let that = IntFloat::new(1068, -2);
+        assert_eq!(that - this, this);
+
+        let this = IntFloat::new(534, -2);
+        let that = IntFloat::new(1068, -2);
+        assert_eq!(that - this, this);
+
+        let this = IntFloat::new(534, 0);
+        let this_too = IntFloat::new(100, 2);
+        let that = IntFloat::new(53500, 2);
+        assert_eq!(that - this, this_too);
+    }
+
+    #[test]
+    fn test_sub_assign() {  // Accuracy of conversion will be tested in respective conversion function
+        let this = IntFloat::new(534, -2);
+        let mut that = IntFloat::new(1068, -2);
+        that -= this;
+        assert_eq!(this, that);
+    }
+
+    #[test]
+    fn test_mul() {  // Accuracy of conversion will be tested in respective conversion function
+        let this = IntFloat::new(500, -2);
+        let that = IntFloat::new(250000, -4);
+        assert_eq!(this * this, that);
+
+        let this = IntFloat::new(500, 2);
+        let that = IntFloat::new(250000, 4);
+        assert_eq!(this * this, that);
+    }
+
+    #[test]
+    fn test_div() {  // Accuracy of conversion will be tested in respective conversion function
+        let this = IntFloat::new(500, -2);
+        let that = IntFloat::new(250000, -4);
+        assert_eq!(that / this, this);
+
+        let this = IntFloat::new(500, 2);
+        let that = IntFloat::new(250000, 4);
+        assert_eq!(that / this, this);
+    }
+
+    #[test]
+    fn test_rem() {  // Accuracy of conversion will be tested in respective conversion function
+        let this = IntFloat::new(499, -2);
+        let that = IntFloat::new(250000, -4);
+        let such = IntFloat::new(1, -4);
+        assert_eq!( that - (that / this) * this, such);
+
+        let this = IntFloat::new(499, 2);
+        let that = IntFloat::new(250000, 4);
+        let such = IntFloat::new(1, 4);
+        assert_eq!( that - (that / this) * this, such);
+    }
+
+    #[test]
+    fn test_to_int() {
+        let this = IntFloat::new(499, -2);
+        assert_eq!(this.to_i64().unwrap(), 49900);
+        assert_eq!(this.to_u64().unwrap(), 49900);
+
+        let this = IntFloat::new(499, 2);
+        assert_eq!(this.to_i64().unwrap(), 4);
+        assert_eq!(this.to_u64().unwrap(), 4);
+    }
+
+    #[test]
+    fn test_to_float() {
+        let this = IntFloat::new(499, -2);
+        assert_eq!(this.to_f32().unwrap(), 49900.0);
+        assert_eq!(this.to_f64().unwrap(), 49900.0);
+
+        let this = IntFloat::new(499, 2);
+        assert_eq!(this.to_f32().unwrap(), 4.99);
+        assert_eq!(this.to_f64().unwrap(), 4.99);
+    }
+
+    #[test]
+    fn test_partial_eq() {
+        let this = IntFloat::new(50000, 2);
+        let that = IntFloat::new(500, 0);
+        let such = IntFloat::new(5, -2);
+        assert_eq!(this, that);
+        assert_eq!(such, that);
     }
 }

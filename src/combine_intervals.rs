@@ -27,22 +27,22 @@ where
     out
 }
 
-/// Combine intervals with values to an efficient and reduced collection.
-/// This is the BaseInterval implementation for valued intervals - which is the main implementation.
+/// Combine intervals with values to an efficient and reduced collection, taking overlaps and
+/// duplicates into account.
+/// Returns an IntervalCollection struct which can be converted further.
 ///
 /// # Examples
 ///
 /// ```
 /// use std::collections::HashMap;
-/// use intervalues;
-/// use intervalues::{Interval, IntervalCollection};
+/// use intervalues::{Interval, IntervalCollection, combine_intervals};
 ///
 /// // Two intervals, from 0 to 2 with count 1 and 1 to 3 with count 2
 /// let input: Vec<[i64; 3]> = vec!([0, 2, 1], [1, 3, 2]);
 /// let input = input.iter()
 ///     .map(|x| Interval::new(x[0], x[1], x[2]))
 ///     .collect();
-/// let out: IntervalCollection<i64,i64> = intervalues::combine_intervals(input);
+/// let out: IntervalCollection<i64,i64> = combine_intervals(input);
 ///
 /// // 'out' = {(0, 1, 1), (2, 3, 2), (1, 2, 3)}
 /// assert_eq!(out.to_vec_as_counter()[0], Interval::default());
@@ -81,4 +81,54 @@ where
         }
     }
     IntervalCollection::from_vec(out)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_with_overlap() {
+        let this: Vec<[i64; 3]> = vec!([0, 2, 1], [1, 3, 2]);
+        let this = this.iter()
+            .map(|x| Interval::new(x[0], x[1], x[2]))
+            .collect();
+        let this = combine_intervals(this);
+        let that: Vec<[i64; 3]> = vec!([0, 1, 1], [1, 2, 3], [2, 3, 2]);
+        let that = that.iter()
+            .map(|x| Interval::new(x[0], x[1], x[2]))
+            .collect();
+        let that = IntervalCollection::from_vec(that);
+        assert_eq!(this, that);
+    }
+
+    #[test]
+    fn test_without_overlap() {
+        let this: Vec<[i64; 3]> = vec!([0, 1, 1], [2, 3, 2]);
+        let this = this.iter()
+            .map(|x| Interval::new(x[0], x[1], x[2]))
+            .collect();
+        let this = IntervalCollection::from_vec(this);
+        let that: Vec<[i64; 3]> = vec!([0, 1, 1], [2, 3, 2]);
+        let that = that.iter()
+            .map(|x| Interval::new(x[0], x[1], x[2]))
+            .collect();
+        let that = combine_intervals(that);
+        assert_eq!(this, that);
+    }
+
+    #[test]
+    fn test_created_overlap() {
+        let this: Vec<[i64; 3]> = vec!([0, 1, 2], [2, 3, -2]);
+        let this = this.iter()
+            .map(|x| Interval::new(x[0], x[1], x[2]))
+            .collect();
+        let this = IntervalCollection::from_vec(this);
+        let that: Vec<[i64; 3]> = vec!([0, 2, 2], [1, 3, -2]);
+        let that = that.iter()
+            .map(|x| Interval::new(x[0], x[1], x[2]))
+            .collect();
+        let that = combine_intervals(that);
+        assert_eq!(this, that);
+    }
 }

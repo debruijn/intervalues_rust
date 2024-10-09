@@ -5,6 +5,28 @@ use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
 
 #[derive(Clone, Hash, Eq, PartialEq, Debug)]
+/// Result of combine_intervals: a collection of Intervals. This can be converted to a Vec of
+/// Intervals, or converted to a Counter (only integer and positive counts instead of values) or
+/// Set (any Interval with value >0 is included and if possible combined with neighbouring
+/// intervals).
+///
+/// # Examples
+///
+/// ```
+/// use std::collections::HashMap;
+/// use intervalues::{Interval, IntervalCollection, combine_intervals, BaseInterval};
+///
+/// // Two intervals, from 0 to 2 with count 1 and 1 to 3 with count 2
+/// let input: Vec<[i64; 3]> = vec!([0, 2, 1], [1, 3, 2]);
+/// let input = input.iter()
+///     .map(|x| Interval::new(x[0], x[1], x[2]))
+///     .collect();
+/// let out: IntervalCollection<i64,i64> = combine_intervals(input);
+///
+/// assert_eq!(out.to_vec_as_counter()[0], Interval::default());
+/// assert_eq!(out.to_vec()[1], Interval::new(1, 2, 3));
+/// assert_eq!(out.to_vec_as_set(), vec!(BaseInterval::new(0, 3)))
+/// ```
 pub struct IntervalCollection<T: Num + PartialOrd + Clone + Display, U: Num + PartialOrd + Display>
 {
     intervals: Vec<Interval<T, U>>,
@@ -99,7 +121,7 @@ where
         false
     }
 
-    pub fn get_value_of_interval_by_parts(
+    pub fn get_value_of_interval_by_parts( // TODO write test for this and test all cases
         &self,
         interval: Interval<T, U>,
     ) -> IntervalCollection<T, U> {
@@ -128,7 +150,7 @@ where
 
     pub fn get_partially_overlaps_interval(&self, other: &Interval<T, U>) -> bool {
         for interval in self.intervals.iter() {
-            if interval.overlaps(*other) {
+            if interval.overlaps(other) {
                 return true;
             }
         }
@@ -152,7 +174,7 @@ where
         self.intervals
     }
 
-    pub fn to_vec(self) -> Vec<Interval<T, U>> {
+    pub fn to_vec(&self) -> Vec<Interval<T, U>> {
         self.intervals.clone()
     }
 
@@ -215,5 +237,85 @@ where
             new.push(this_interval);
         }
         new
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::combine_intervals;
+
+    fn get_input() -> Vec<Interval<i64, i64>>{
+        let input: Vec<[i64; 3]> = vec!([0, 2, 1], [1, 3, 2]);
+        let input = input.iter()
+            .map(|x| Interval::new(x[0], x[1], x[2]))
+            .collect();
+        input
+    }
+
+    #[test]
+    fn test_bounds() {
+        let this = IntervalCollection::from_vec(get_input());
+        assert_eq!(this.get_lb(), 0);
+        assert_eq!(this.get_ub(), 3);
+        assert_eq!(this.get_bounds(), (0, 3));
+    }
+
+    #[test]
+    fn test_contains() {
+        let this = combine_intervals::combine_intervals(get_input());
+        assert!(this.contains_num(1));
+        assert!(this.contains_num(2));
+        assert!(this.contains_num(3));
+        assert!(!this.contains_num(4));
+        assert!(!this.contains_num(-1));
+    }
+
+    #[test]
+    fn test_value() {
+        let this = combine_intervals::combine_intervals(get_input());
+        assert_eq!(this.get_value(1), 1);
+        assert_eq!(this.get_value(2), 3);
+        assert_eq!(this.get_value(3), 2);
+        assert_eq!(this.get_value(4), 0);
+    }
+
+    #[test]
+    fn test_contains_interval() {
+        let this = combine_intervals::combine_intervals(get_input());
+        assert!(this.contains_interval(Interval::new(1, 2, 1)));
+        assert!(this.contains_interval(Interval::new(0, 2, 1)));
+        assert!(this.contains_interval(Interval::new(0, 3, 1)));
+        assert!(this.contains_interval(Interval::new(1, 2, 6)));
+        assert!(!this.contains_interval(Interval::new(-1, 2, 1)));
+    }
+
+    // #[test]
+    // fn test_value_interval_by_parts() {
+    //     let this = combine_intervals::combine_intervals(get_input());
+    //     let that: Vec<[i64; 3]> = vec!([1, 2, 1], [2, 3, 1]);
+    //     let that = that.iter()
+    //         .map(|x| Interval::new(x[0], x[1], x[2]))
+    //         .collect();
+    //     let that = IntervalCollection::from_vec(that);
+    //     assert_eq!(this.get_value_of_interval_by_parts(Interval::new(-1, 4, 2)), that);
+    // }
+    //
+
+    #[test]
+    fn test_total_value() {
+        let this = combine_intervals::combine_intervals(get_input());
+        assert_eq!(this.total_value(), 6);
+    }
+
+
+
+    #[test]
+    fn test_len() {
+        let this = IntervalCollection::from_vec(get_input());
+        assert_eq!(this.len(), 2);
+        let this = combine_intervals::combine_intervals(get_input());
+        assert_eq!(this.len(), 3);
+
     }
 }

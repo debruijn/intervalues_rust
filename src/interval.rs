@@ -116,7 +116,7 @@ where
     }
 
     pub fn left_overlaps(&self, other: &Interval<T, U>) -> bool {
-        if (self.lb <= other.lb) & (self.ub <= other.ub) {
+        if (self.lb <= other.lb) & (self.ub <= other.ub) & (other.lb <= self.ub) {
             true
         } else {
             false
@@ -127,8 +127,8 @@ where
         other.left_overlaps(&self)
     }
 
-    pub fn overlaps(self, other: Interval<T, U>) -> bool {
-        self.left_overlaps(&other) || self.right_overlaps(&other)
+    pub fn overlaps(self, other: &Interval<T, U>) -> bool {
+        self.left_overlaps(other) || self.right_overlaps(other)
     }
 
     pub fn can_join(self, other: &Interval<T, U>) -> bool {
@@ -158,7 +158,7 @@ where
     }
 
     pub fn can_join_as_set(self, other: &Interval<T, U>) -> bool {
-        if (self.ub == other.lb) || (other.ub == self.lb) {
+        if self.overlaps(other) {
             true
         } else {
             false
@@ -224,6 +224,8 @@ where
 
 #[cfg(test)]
 mod tests {
+    use num_traits::One;
+    use crate::IntFloat;
     use super::*;
 
     #[test]
@@ -256,14 +258,119 @@ mod tests {
     }
 
     #[test]
-    fn test_val_to_count() {
-        let a = Interval::new(1, 2, 1.5);
-        assert_eq!(a.val_to_count().get_value(), 1)
+    fn test_create_intfloat_interval() {
+        let a = Interval::new(IntFloat::one(), IntFloat::from(3.0, 0), IntFloat::from(3.0, 0));
+        assert_eq!(a.len(), IntFloat::from(2.0, 0));
+        assert_eq!(a.get_value(), IntFloat::from(3.0, 0));
+        assert_eq!(a.get_total_value(), IntFloat::from(6.0, 0))
     }
 
     #[test]
-    fn test_val_to_count2() {
-        let a = Interval::new(1, 2, 1);
-        assert_eq!(a.val_to_count().get_value(), 1)
+    fn test_bounds() {
+        let a = Interval::new(3, 7,  2);
+        assert_eq!(a.to_tuple(), (3, 7, 2));
+        assert_eq!(a.get_bounds(), (3, 7));
+        assert_eq!(a.get_lb(), 3);
+        assert_eq!(a.get_ub(), 7);
+        assert_eq!(a.get_width(), 4);
     }
+
+    #[test]
+    fn test_total_value() {
+        let a = Interval::new(3, 7, 2);
+        assert_eq!(a.get_total_value(), 8);
+        assert_eq!(a.get_value(), 2);
+    }
+
+    #[test]
+    fn test_contains() {
+        let a = Interval::new(3, 7, 2);
+        assert!(a.contains(4));
+        assert!(a.contains(3));
+        assert!(a.contains(7));
+        assert!(!a.contains(0));
+    }
+
+    #[test]
+    fn test_superset_subset() {
+        let a = Interval::new(3, 7, 2);
+        let b = Interval::new(4, 6, 1);
+
+        assert!(a.superset(b));
+        assert!(b.subset(a));
+        assert!(!a.subset(b));
+        assert!(!b.superset(a));
+    }
+
+    #[test]
+    fn test_overlaps() {
+        let a = Interval::new(3, 6, 1);
+        let b = Interval::new(4, 7, 2);
+
+        assert!(a.left_overlaps(&b));
+        assert!(b.right_overlaps(&a));
+        assert!(!a.right_overlaps(&b));
+        assert!(!b.left_overlaps(&a));
+    }
+
+    #[test]
+    fn test_join() {
+        let a = Interval::new(0, 2, 1);
+        let b = Interval::new(2, 4, 2);
+        let c = Interval::new(4, 6, 2);
+
+        assert!(!a.can_join(&b));
+        assert!(c.can_join(&b));
+        assert!(b.can_join(&c));
+        assert!(!a.can_join(&c));
+
+        let d = Interval::new(0, 2, 2);
+        let e = Interval::new(2,6, 2);
+
+        assert_eq!(a.join(a), d);
+        assert_eq!(c.join(b), e);
+    }
+
+    #[test]
+    fn test_join_ign_value() {
+        let a = Interval::new(0, 2, 2);
+        let b = Interval::new(1, 4, 3);
+        let c = Interval::new(3, 6, 6);
+
+        assert!(a.can_join_as_set(&b));
+        assert!(c.can_join_as_set(&b));
+        assert!(b.can_join_as_set(&c));
+        assert!(!a.can_join_as_set(&c));
+
+        let d = BaseInterval::new(0, 4);
+        let e = BaseInterval::new(1,6);
+        let d2 = Interval::new(0, 4, 1);
+        let e2 = Interval::new(1,6, 1);
+
+        assert_eq!(a.join_as_set(b), d);
+        assert_eq!(c.join_as_set(b), e);
+
+        assert_eq!(a.join_ign_value(b), d2);
+        assert_eq!(c.join_ign_value(b), e2);
+    }
+
+
+    #[test]
+    fn test_val_to_count() {
+        let a = Interval::new(0, 2, 3.5);
+        let b = Interval::new(0, 2, 3);
+        assert_eq!(a.val_to_count(), b);
+
+        let c = Interval::new(0, 2, -3.5);
+        let d = Interval::new(0, 2, 0);
+        assert_eq!(c.val_to_count(), d);
+    }
+
+    #[test]
+    fn test_to_base() {
+        let a = Interval::new(0, 2, 3.5);
+        let b = BaseInterval::new(0, 2);
+        assert_eq!(a.to_base(), b)
+    }
+
 }
