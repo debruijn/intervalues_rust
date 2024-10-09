@@ -1,47 +1,43 @@
-use num_traits::{Num, ToPrimitive};
+use num_traits::Num;
 use std::cmp::PartialOrd;
 
+
 #[derive(Clone, Copy, Hash, Eq, PartialEq, Debug)]
-pub struct Interval<T: Num, U: Num> {
+pub struct BaseInterval<T: Num> {
     lb: T,
     ub: T,
-    val: U,
 }
 
-
-impl<T, U> Default for Interval<T, U>
+impl<T> Default for BaseInterval<T>
 where
     T: Num + PartialOrd + Clone,
-    U: Num,
 {
     fn default() -> Self {
-        Interval {
+        BaseInterval {
             lb: T::zero(),
             ub: T::one(),
-            val: U::one(),
         }
     }
 }
 
-impl<T, U> Interval<T, U>
+
+impl<T> BaseInterval<T>
 where
     T: Num + PartialOrd + Clone,
-    U: Num + PartialOrd,
 {
-    pub fn new(lb: T, ub: T, val: U) -> Self {
+    pub fn new(lb: T, ub: T,) -> Self {
         if ub > lb {
-            Interval { lb, ub, val }
+            BaseInterval { lb, ub }
         } else {
-            Interval {
+            BaseInterval {
                 lb: ub,
                 ub: lb,
-                val,
             }
         }
     }
 
-    pub fn to_tuple(self) -> (T, T, U) {
-        (self.lb, self.ub, self.val)
+    pub fn to_tuple(self) -> (T, T) {
+        (self.lb, self.ub)
     }
 
     pub fn get_bounds(self) -> (T, T) {
@@ -60,8 +56,8 @@ where
         self.ub - self.lb
     }
 
-    pub fn get_value(self) -> U {
-        self.val
+    pub fn get_value(self) -> T {  // For consistency
+        T::one()
     }
 
     pub fn len(self) -> T {
@@ -76,8 +72,7 @@ where
         }
     }
 
-    // TODO explore if T can be U here
-    pub fn superset(self, other: Interval<T, U>) -> bool {
+    pub fn superset(self, other: BaseInterval<T>) -> bool {
         if (other.ub <= self.ub) && (other.lb >= self.lb) {
             true
         } else {
@@ -85,11 +80,11 @@ where
         }
     }
 
-    pub fn subset(self, other: Interval<T, U>) -> bool {
+    pub fn subset(self, other: BaseInterval<T>) -> bool {
         other.superset(self)
     }
 
-    pub fn left_overlaps(&self, other: &Interval<T, U>) -> bool {
+    pub fn left_overlaps(&self, other: &BaseInterval<T>) -> bool {
         if (self.lb <= other.lb) & (self.ub <= other.ub) {
             true
         } else {
@@ -97,29 +92,27 @@ where
         }
     }
 
-    pub fn right_overlaps(self, other: &Interval<T, U>) -> bool {
+    pub fn right_overlaps(self, other: &BaseInterval<T>) -> bool {
         other.left_overlaps(&self)
     }
 
-    pub fn overlaps(self, other: Interval<T, U>) -> bool {
+    pub fn overlaps(self, other: BaseInterval<T>) -> bool {
         self.left_overlaps(&other) || self.right_overlaps(&other)
     }
 
-    pub fn can_join(self, other: &Interval<T, U>) -> bool {
-        if ((self.ub == other.lb) || (other.ub == self.lb)) && (self.val == other.val) {
-            true
-        } else if (self.ub == other.ub) && (self.lb == other.lb) {
+    pub fn can_join(self, other: BaseInterval<T>) -> bool {  // TODO: to test this more
+        if self.overlaps(other) {
             true
         } else {
             false
         }
     }
 
-    pub fn join(self, other: Interval<T, U>) -> Interval<T, U> {
+    pub fn join(self, other: BaseInterval<T>) -> BaseInterval<T> {
         // Two options to enter this -> same range, or bordering range but same val
         // So test (and if so, return for) option 1, and then continue with option 2
         if (self.ub == other.ub) && (self.lb == other.lb) {
-            return Interval::new(self.lb, self.ub, self.val + other.val);
+            return BaseInterval::new(self.lb, self.ub);
         }
 
         // Option 2 from above
@@ -128,55 +121,14 @@ where
         } else {
             (other.lb, self.ub)
         };
-        Interval::new(lb, ub, self.val)
+        BaseInterval::new(lb, ub)
     }
 
-    pub fn can_join_ign_value(self, other: &Interval<T, U>) -> bool {
-        if (self.ub == other.lb) || (other.ub == self.lb) {
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn join_ign_value(self, other: Interval<T, U>) -> Interval<T, U> {
-        let lb = if self.lb < other.lb {
-            self.lb
-        } else {
-            other.lb
-        };
-        let ub = if self.ub > other.ub {
-            self.ub
-        } else {
-            other.ub
-        };
-        Interval::new(lb, ub, U::one())
+    pub fn get_total_value(self) -> T {  // For consistency
+        self.get_width()
     }
 }
 
-impl<T> Interval<T, T>
-where
-    T: Num,
-{
-    pub fn get_total_value(self) -> T {
-        (self.ub - self.lb) * self.val
-    }
-}
-
-impl<T, U> Interval<T, U>
-where
-    T: Num + Clone + PartialOrd,
-    U: Num + PartialOrd + ToPrimitive,
-{
-    pub fn val_to_count(self) -> Interval<T, usize> {
-        // To test if this works
-        if self.val >= U::one() {
-            Interval::new(self.lb, self.ub, self.val.to_usize().unwrap())
-        } else {
-            Interval::new(self.lb, self.ub, 0)
-        }
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -184,42 +136,17 @@ mod tests {
 
     #[test]
     fn test_create_int_interval() {
-        let a = Interval::new(1, 2, 1);
+        let a = BaseInterval::new(1, 2);
         assert_eq!(a.len(), 1);
         assert_eq!(a.get_value(), 1)
     }
 
     #[test]
     fn test_create_float_interval() {
-        let a = Interval::new(1.0, 4.0, 2.0);
+        let a = BaseInterval::new(1.0, 4.0);
         assert_eq!(a.len(), 3.0);
-        assert_eq!(a.get_value(), 2.0);
-        assert_eq!(a.get_total_value(), 6.0)
+        assert_eq!(a.get_value(), 1.0);
+        assert_eq!(a.get_total_value(), 3.0)
     }
 
-    #[test]
-    fn test_create_mixed_interval() {
-        let a = Interval::new(1.0, 2.0, 1);
-        assert_eq!(a.len(), 1.0);
-        assert_eq!(a.get_value(), 1)
-    }
-
-    #[test]
-    fn test_create_mixed_interval2() {
-        let a = Interval::new(1, 2, 1.0);
-        assert_eq!(a.len(), 1);
-        assert_eq!(a.get_value(), 1.0)
-    }
-
-    #[test]
-    fn test_val_to_count() {
-        let a = Interval::new(1, 2, 1.5);
-        assert_eq!(a.val_to_count().get_value(), 1)
-    }
-
-    #[test]
-    fn test_val_to_count2() {
-        let a = Interval::new(1, 2, 1);
-        assert_eq!(a.val_to_count().get_value(), 1)
-    }
 }
