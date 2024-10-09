@@ -1,4 +1,4 @@
-use crate::base_interval::Interval;
+use crate::interval::Interval;
 use crate::IntervalCollection;
 use defaultmap::DefaultHashMap;
 use itertools::Itertools;

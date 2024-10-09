@@ -1,4 +1,4 @@
-use crate::Interval;
+use crate::{BaseInterval, Interval};
 use num_traits::{Num, ToPrimitive};
 use safecast::CastInto;
 
@@ -134,7 +134,7 @@ where
         self.intervals.clone()
     }
 
-    pub fn to_vec_as_set(&self) -> Vec<Interval<T, U>> {
+    pub fn to_vec_as_set(&self) -> Vec<BaseInterval<T>> {
         // TODO: create unvalued BI (no U)
         let mut new = Vec::new();
         if self.len() == 0 {
@@ -142,14 +142,14 @@ where
         }
         let mut this_interval = self.intervals[0];
         for next_interval in self.intervals[1..].iter() {
-            if this_interval.can_join_ign_value(next_interval) {
+            if this_interval.can_join_as_set(next_interval) {
                 this_interval = this_interval.join_ign_value(*next_interval);
             } else {
-                new.push(this_interval);
+                new.push(this_interval.to_base());
                 this_interval = *next_interval;
             }
         }
-        new.push(this_interval);
+        new.push(this_interval.to_base());
         new
     }
 }
