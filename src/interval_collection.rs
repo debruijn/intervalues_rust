@@ -183,13 +183,13 @@ where
             if this_interval.can_join(&next_count) {
                 this_interval = this_interval.join(next_count);
             } else {
-                if this_interval.get_value() > 1 {
+                if this_interval.get_value() >= 1 {
                     new.push(this_interval);
                 }
                 this_interval = next_count;
             }
         }
-        if this_interval.get_value() > 1 {
+        if this_interval.get_value() >= 1 {
             new.push(this_interval);
         }
         new
