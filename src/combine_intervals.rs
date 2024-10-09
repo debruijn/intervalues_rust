@@ -1,9 +1,9 @@
-use std::fmt::Display;
 use crate::interval::Interval;
 use crate::IntervalCollection;
 use defaultmap::DefaultHashMap;
 use itertools::Itertools;
 use num_traits::{Num, ToPrimitive};
+use std::fmt::Display;
 use std::hash::Hash;
 use std::ops::{AddAssign, SubAssign};
 

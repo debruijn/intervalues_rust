@@ -21,10 +21,9 @@ where
     }
 }
 
-
 impl<T> Debug for BaseInterval<T>
 where
-    T: Num + PartialOrd + Clone + Display,  // TODO revert Debug to just use Debug
+    T: Num + PartialOrd + Clone + Display,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.print())
@@ -38,23 +37,17 @@ where
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.print())
     }
-
 }
-
-
 
 impl<T> BaseInterval<T>
 where
     T: Num + PartialOrd + Clone + Display,
 {
-    pub fn new(lb: T, ub: T,) -> Self {
+    pub fn new(lb: T, ub: T) -> Self {
         if ub > lb {
             BaseInterval { lb, ub }
         } else {
-            BaseInterval {
-                lb: ub,
-                ub: lb,
-            }
+            BaseInterval { lb: ub, ub: lb }
         }
     }
 
@@ -82,7 +75,8 @@ where
         self.ub - self.lb
     }
 
-    pub fn get_value(self) -> T {  // For consistency
+    pub fn get_value(self) -> T {
+        // For consistency
         T::one()
     }
 
@@ -126,7 +120,8 @@ where
         self.left_overlaps(&other) || self.right_overlaps(&other)
     }
 
-    pub fn can_join(self, other: BaseInterval<T>) -> bool {  // TODO: to test this more
+    pub fn can_join(self, other: BaseInterval<T>) -> bool {
+        // TODO: to test this more
         if self.overlaps(other) {
             true
         } else {
@@ -150,11 +145,11 @@ where
         BaseInterval::new(lb, ub)
     }
 
-    pub fn get_total_value(self) -> T {  // For consistency
+    pub fn get_total_value(self) -> T {
+        // For consistency
         self.get_width()
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -174,5 +169,4 @@ mod tests {
         assert_eq!(a.get_value(), 1.0);
         assert_eq!(a.get_total_value(), 3.0)
     }
-
 }

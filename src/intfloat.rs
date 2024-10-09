@@ -43,7 +43,6 @@ impl Display for IntFloat {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.print())
     }
-
 }
 
 impl Add<Self> for IntFloat {

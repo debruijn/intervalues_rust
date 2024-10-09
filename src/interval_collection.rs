@@ -1,26 +1,24 @@
-use std::fmt;
-use std::fmt::{Debug, Display, Formatter};
 use crate::{BaseInterval, Interval};
 use num_traits::{Num, ToPrimitive};
 use safecast::CastInto;
+use std::fmt;
+use std::fmt::{Debug, Display, Formatter};
 
 #[derive(Clone, Hash, Eq, PartialEq, Debug)]
-pub struct IntervalCollection<T: Num + PartialOrd + Clone + Display, U: Num + PartialOrd + Display> {
+pub struct IntervalCollection<T: Num + PartialOrd + Clone + Display, U: Num + PartialOrd + Display>
+{
     intervals: Vec<Interval<T, U>>,
 }
-
 
 impl<T, U> Display for IntervalCollection<T, U>
 where
     T: Num + PartialOrd + Clone + Copy + Display,
-    U: Num + PartialOrd + Clone + Copy + Display + std::iter::Sum
+    U: Num + PartialOrd + Clone + Copy + Display + std::iter::Sum,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.print())
     }
-
 }
-
 
 impl<T, U> IntervalCollection<T, U>
 where
@@ -36,8 +34,12 @@ where
     }
 
     pub fn print(&self) -> String {
-        format!("IntervalCollection ({}x between {} and {})",
-                self.len(), self.get_lb(), self.get_ub())
+        format!(
+            "IntervalCollection ({}x between {} and {})",
+            self.len(),
+            self.get_lb(),
+            self.get_ub()
+        )
     }
 
     pub fn get_lb(&self) -> T {

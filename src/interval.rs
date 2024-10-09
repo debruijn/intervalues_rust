@@ -1,8 +1,8 @@
+use crate::BaseInterval;
 use num_traits::{Num, ToPrimitive};
 use std::cmp::PartialOrd;
 use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
-use crate::BaseInterval;
 
 #[derive(Clone, Copy, Hash, Eq, PartialEq)]
 pub struct Interval<T: Num, U: Num> {
@@ -25,11 +25,10 @@ where
     }
 }
 
-
 impl<T, U> Debug for Interval<T, U>
 where
     T: Num + PartialOrd + Clone + Display,
-    U: Num + PartialOrd + Display// TODO revert Debug to just use Debug
+    U: Num + PartialOrd + Display,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.print())
@@ -39,14 +38,12 @@ where
 impl<T, U> Display for Interval<T, U>
 where
     T: Num + PartialOrd + Clone + Display,
-    U: Num + PartialOrd + Display
+    U: Num + PartialOrd + Display,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.print())
     }
-
 }
-
 
 impl<T, U> Interval<T, U>
 where
@@ -181,7 +178,6 @@ where
         };
         Interval::new(lb, ub, U::one())
     }
-
 
     pub fn join_as_set(self, other: Interval<T, U>) -> BaseInterval<T> {
         let lb = if self.lb < other.lb {

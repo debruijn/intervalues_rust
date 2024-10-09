@@ -21,11 +21,7 @@ fn main() {
     let mut input = Vec::new();
     let n = 1000000;
     for _ in 0..n {
-        input.push(Interval::new(
-            rng.gen_range(0..10),
-            rng.gen_range(0..10),
-            1,
-        ));
+        input.push(Interval::new(rng.gen_range(0..10), rng.gen_range(0..10), 1));
     }
     let before = Instant::now();
     let hi = intervalues::combine_intervals(input);
@@ -87,5 +83,4 @@ fn main() {
     let after = Instant::now();
     println!("{:?} in {:?}", hi, after - before);
     println!("{} in {:?}", hi, after - before);
-
 }
