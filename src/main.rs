@@ -86,4 +86,6 @@ fn main() {
     let hi = intervalues::combine_intervals(input);
     let after = Instant::now();
     println!("{:?} in {:?}", hi, after - before);
+    println!("{} in {:?}", hi, after - before);
+
 }
