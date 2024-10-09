@@ -1,8 +1,9 @@
 use num_traits::Num;
 use std::cmp::PartialOrd;
+use std::fmt;
+use std::fmt::{Debug, Display, Formatter};
 
-
-#[derive(Clone, Copy, Hash, Eq, PartialEq, Debug)]
+#[derive(Clone, Copy, Hash, Eq, PartialEq)]
 pub struct BaseInterval<T: Num> {
     lb: T,
     ub: T,
@@ -21,9 +22,30 @@ where
 }
 
 
+impl<T> Debug for BaseInterval<T>
+where
+    T: Num + PartialOrd + Clone + Display,  // TODO revert Debug to just use Debug
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.print())
+    }
+}
+
+impl<T> Display for BaseInterval<T>
+where
+    T: Num + PartialOrd + Clone + Display,
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.print())
+    }
+
+}
+
+
+
 impl<T> BaseInterval<T>
 where
-    T: Num + PartialOrd + Clone,
+    T: Num + PartialOrd + Clone + Display,
 {
     pub fn new(lb: T, ub: T,) -> Self {
         if ub > lb {
@@ -34,6 +56,10 @@ where
                 ub: lb,
             }
         }
+    }
+
+    pub fn print(&self) -> String {
+        format!("[{};{}]", self.lb, self.ub)
     }
 
     pub fn to_tuple(self) -> (T, T) {
