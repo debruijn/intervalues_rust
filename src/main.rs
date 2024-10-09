@@ -4,6 +4,7 @@ use num_traits::ToPrimitive;
 use rand::Rng;
 use rust_decimal::Decimal;
 use std::time::Instant;
+use intervalues::IntFloat;
 
 fn main() {
     let mut rng = rand::thread_rng();
@@ -61,6 +62,24 @@ fn main() {
             Decimal::from_f32_retain(0.5 + rng.gen_range(0..10).to_f32().unwrap()).unwrap(),
             Decimal::from_f32_retain(0.5 + rng.gen_range(0..10).to_f32().unwrap()).unwrap(),
             Decimal::from_f32_retain(1.5).unwrap(),
+        ));
+    }
+    let before = Instant::now();
+    let hi = intervalues::combine_intervals(input);
+    let after = Instant::now();
+    println!("{:?} in {:?}", hi, after - before);
+
+    println!(
+        "\n(4) Valued and using IntFloat typed interval borders, value set to IntFloat(1.5) for all. \
+    Converts to BaseInterval and returns IntervalCollection"
+    );
+    let mut input = Vec::new();
+    let n = 1000000;
+    for _ in 0..n {
+        input.push(BaseInterval::new(
+            IntFloat::from(0.5 + rng.gen_range(0..10).to_f32().unwrap(), 1),
+            IntFloat::from(0.5 + rng.gen_range(0..10).to_f32().unwrap(), 1),
+            IntFloat::from(1.5, 1),
         ));
     }
     let before = Instant::now();
