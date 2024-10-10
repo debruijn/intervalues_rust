@@ -213,11 +213,21 @@ version = "0.3.0"
 dependencies = [
  "counter",
  "defaultmap",
+ "intfloat",
  "itertools",
  "num-traits",
  "rand",
  "rust_decimal",
  "safecast",
+]
+
+[[package]]
+name = "intfloat"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "907c4f29622b175a76ddc698433b807b35b62c57e5b50842345bc23b2adb51db"
+dependencies = [
+ "num-traits",
 ]
 
 [[package]]

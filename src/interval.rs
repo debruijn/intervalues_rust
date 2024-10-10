@@ -5,6 +5,19 @@ use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
 
 #[derive(Clone, Copy, Hash, Eq, PartialEq)]
+/// Interval struct that contains a lowerbound, upperbound and value/count of the range within the
+/// interval. These can be aggregated together using intervalues::combine_intervals().
+///
+/// # Examples
+///
+/// ```
+/// use intervalues::Interval;
+///
+/// let x = Interval::new(0, 1, 2.5);
+/// assert_eq!(x.get_lb(), 0);
+/// assert_eq!(x.get_ub(), 1);
+/// assert_eq!(x.get_value(), 2.5);
+/// ```
 pub struct Interval<T: Num, U: Num> {
     lb: T,
     ub: T,
@@ -225,7 +238,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::IntFloat;
+    use intfloat::IntFloat;
     use num_traits::One;
 
     #[test]
