@@ -7,7 +7,7 @@ license = "MIT OR Apache-2.0"
 documentation = "https://docs.rs/intervalues"
 repository = "https://github.com/debruijn/intervalues_rust"
 authors = ["Bert de Bruijn"]
-keywords = ["intervals"]
+keywords = ["intervals", "intervalues", "intfloat"]
 
 [dependencies]
 counter = "0.6.0"
