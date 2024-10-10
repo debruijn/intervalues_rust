@@ -1,5 +1,5 @@
 use intervalues;
-use intervalues::IntFloat;
+use intfloat::IntFloat;
 use intervalues::Interval;
 use num_traits::ToPrimitive;
 use rand::Rng;
