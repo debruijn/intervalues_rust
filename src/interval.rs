@@ -238,7 +238,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::IntFloat;
+    use intfloat::IntFloat;
     use num_traits::One;
 
     #[test]
