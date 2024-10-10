@@ -92,7 +92,7 @@ where
 ///
 /// ```
 /// use std::collections::HashMap;
-/// use intervalues::{Interval, IntervalCollection, combine_intervals, combine_as_set, BaseInterval};
+/// use intervalues::{Interval, IntervalCollection, combine_as_set, BaseInterval};
 ///
 /// // Two intervals, from 0 to 2 with count 1 and 1 to 3 with count 2
 /// let input: Vec<[i64; 3]> = vec!([0, 2, 1], [1, 3, 2]);

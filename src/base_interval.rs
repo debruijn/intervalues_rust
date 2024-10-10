@@ -4,6 +4,19 @@ use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
 
 #[derive(Clone, Copy, Hash, Eq, PartialEq)]
+/// Interval struct that contains a lowerbound and upperbound without a value or count.
+///
+/// # Examples
+///
+/// ```
+/// use intervalues::{Interval, BaseInterval};
+///
+/// let x = BaseInterval::new(0, 1);
+/// let y = Interval::new(0, 1, 2);
+/// assert_eq!(x.get_lb(), 0);
+/// assert_eq!(x.get_ub(), 1);
+/// assert_eq!(x, y.to_base());
+/// ```
 pub struct BaseInterval<T: Num> {
     lb: T,
     ub: T,

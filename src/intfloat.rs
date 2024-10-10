@@ -5,6 +5,24 @@ use std::num::ParseIntError;
 use std::ops::{Add, AddAssign, Div, Mul, Rem, Sub, SubAssign};
 
 #[derive(Clone, Copy, Hash, Eq, PartialOrd, Default, Debug)]
+/// Simplified alternative to rust_decimal::Decimal to use combine_intervals with floats. Standard
+/// library floats can't be hashed which is needed for the internal implementation.
+/// The number is converted to a x 10^-b, with a and b being integers (and thus Hashable).
+///
+/// Note that when accuracy is important, rust_decimal::Decimal is a safer alternative. But when
+/// speed is needed, this implementation is faster.
+///
+/// # Examples
+///
+/// ```
+/// use intervalues::IntFloat;
+/// let a = IntFloat::from(10 as f32, 0);
+/// let b = IntFloat::from(5.2, 0);
+/// assert_eq!(a, b+b);
+///
+/// let c = IntFloat::from(5.2, 1);
+/// assert_ne!(b, c);
+/// ```
 pub struct IntFloat {
     base: isize,
     pow: isize,
