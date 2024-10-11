@@ -1,6 +1,6 @@
 use intervalues;
-use intfloat::IntFloat;
 use intervalues::Interval;
+use intfloat::IntFloat;
 use num_traits::ToPrimitive;
 use rand::Rng;
 use rust_decimal::Decimal;

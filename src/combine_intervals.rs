@@ -241,10 +241,8 @@ mod tests {
     #[test]
     fn test_set_without_overlap() {
         let this: Vec<[i64; 2]> = vec![[0, 1], [2, 3]];
-        let this: Vec<BaseInterval<i64>> = this
-            .iter()
-            .map(|x| BaseInterval::new(x[0], x[1]))
-            .collect();
+        let this: Vec<BaseInterval<i64>> =
+            this.iter().map(|x| BaseInterval::new(x[0], x[1])).collect();
         let that: Vec<[i64; 3]> = vec![[0, 1, 1], [2, 3, 2]];
         let that = that
             .iter()

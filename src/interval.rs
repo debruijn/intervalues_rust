@@ -1,5 +1,7 @@
 use crate::BaseInterval;
+use intfloat::IntFloat;
 use num_traits::{Num, ToPrimitive};
+use rust_decimal::Decimal;
 use std::cmp::PartialOrd;
 use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
@@ -235,11 +237,31 @@ where
     }
 }
 
+impl Interval<IntFloat, IntFloat> {
+    pub fn to_f32(self) -> (f32, f32, f32) {
+        (
+            self.lb.to_f32().unwrap(),
+            self.ub.to_f32().unwrap(),
+            self.val.to_f32().unwrap(),
+        )
+    }
+}
+
+impl Interval<Decimal, Decimal> {
+    pub fn to_f32(self) -> (f32, f32, f32) {
+        (
+            self.lb.to_f32().unwrap(),
+            self.ub.to_f32().unwrap(),
+            self.val.to_f32().unwrap(),
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use intfloat::IntFloat;
-    use num_traits::One;
+    use num_traits::{FromPrimitive, One};
 
     #[test]
     fn test_create_int_interval() {
@@ -387,5 +409,20 @@ mod tests {
         let a = Interval::new(0, 2, 3.5);
         let b = BaseInterval::new(0, 2);
         assert_eq!(a.to_base(), b)
+    }
+
+    #[test]
+    fn test_to_f32() {
+        let a = Interval::new(
+            Decimal::from_f32(1.2).unwrap(),
+            Decimal::from_f32(3.5).unwrap(),
+            Decimal::from_f32(2.5).unwrap(),
+        );
+        let b = Interval::new(
+            IntFloat::from(1.2, 1),
+            IntFloat::from(3.5, 1),
+            IntFloat::from(2.5, 1),
+        );
+        assert_eq!(a.to_f32(), b.to_f32());
     }
 }
