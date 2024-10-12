@@ -11,7 +11,7 @@ Alternatively, you can edit your `Cargo.toml` directly and run `cargo update`:
 
 ```toml
 [dependencies]
-intervalues = "0.3.0"
+intervalues = "0.3.1"
 ```
 
 ## Getting started
